@@ -2,10 +2,10 @@
   "name": "spotify-playlist-generator",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "src/server/server.ts",
   "scripts": {
     "start": "webpack serve --hot --open",
-    "dev": "webpack serve --hot --open & nodemon src/server/server.js",
+    "dev": "nodemon",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
