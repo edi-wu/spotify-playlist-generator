@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Request, Response, NextFunction } from 'express';
 
-type ServerError = {
+export type ServerError = {
   log: string;
   status: number;
   message: {
@@ -14,12 +14,12 @@ export const unknownEndpoint = (
   res: Response,
   next: NextFunction
 ): void => {
-  const errorObj: ServerError = {
+  const endpointError: ServerError = {
     log: 'Request was made to an unavailable endpoint.',
     status: 404,
     message: { err: 'An error has occurred: endpoint not found.' },
   };
-  return next(errorObj);
+  return next(endpointError);
 };
 
 export const globalErrorHandler = (
