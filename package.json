@@ -4,7 +4,7 @@
   "description": "",
   "main": "src/server/server.ts",
   "scripts": {
-    "start": "webpack serve --hot --open",
+    "start": "webpack serve --hot --open & nodemon",
     "dev": "nodemon",
     "test": "NODE_ENV=test jest"
   },
