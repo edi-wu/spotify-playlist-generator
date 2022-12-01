@@ -1,39 +1,34 @@
 // const path = require('path');
-const express = require('express');
-const cors = require('cors');
-const cookieParser = require('cookie-parser');
+import express, { Express } from 'express';
+import dotenv from 'dotenv';
+import { unknownEndpoint, globalErrorHandler } from './utils/middleware';
 
-const PORT = process.env.PORT || 3000;
+dotenv.config();
+// const cors = require('cors');
+// const cookieParser = require('cookie-parser');
 
-const app = express();
+const PORT: string = process.env.PORT || '3000';
 
-app.use(cors());
+const app: Express = express();
+
+// app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(cookieParser());
+// app.use(cookieParser());
 
-// use api, go to apirouter
-// app.use('/api', apiRouter);
+// TODO: define routes here
 
 // redirect to react UI
-// app.get('/*', (req, res) => {
-//   res.sendFile(path.resolve(__dirname, '../../client/index.html'));
-// });
+app.get('/', (req, res) => {
+  // res.sendFile(path.resolve(__dirname, '../../client/index.html'));
+  res.send('testing');
+});
 
-// global error handler
-// app.use((err, req, res, next) => {
-//   const defaultErr = {
-//     log: 'Express error handler caught unknown middleware error',
-//     status: 500,
-//     message: { err: 'An error occurred' },
-//   };
-//   const errorObj = Object.assign({}, defaultErr, err);
-//   console.log(errorObj.log);
-//   return res.status(errorObj.status).json(errorObj.message);
-// });
+app.use('/*', unknownEndpoint);
+app.use(globalErrorHandler);
 
-app.listen(PORT, () => {
+app.listen(PORT, (): void => {
   console.log(`Server listening on ${PORT}`);
 });
 
-module.exports = app;
+export default app;
