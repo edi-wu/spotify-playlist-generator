@@ -27,7 +27,9 @@
         "namedComponents": "arrow-function"
       }
     ],
-    "no-console": "off"
+    "no-console": "off",
+    "comma-dangle": "off",
+    "@typescript-eslint/comma-dangle": "off"
   },
   "settings": {
     "import/resolver": {
