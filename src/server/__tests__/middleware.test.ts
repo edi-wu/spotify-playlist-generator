@@ -12,7 +12,7 @@ beforeAll(() => {
 });
 
 describe('test general error handling middleware', () => {
-  it('should handle request to unknown endpoint', async () => {
+  test('middleware should handle request to unknown endpoint', async () => {
     const response: request.Response = await request(server).get(
       '/impossible-endpoint'
     );
