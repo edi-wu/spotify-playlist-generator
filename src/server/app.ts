@@ -1,6 +1,7 @@
 import path from 'path';
 import express, { Express } from 'express';
 import { unknownEndpoint, globalErrorHandler } from './utils/middleware';
+import apiRouter from './routes/api';
 
 // const cors = require('cors');
 // const cookieParser = require('cookie-parser');
@@ -13,6 +14,7 @@ app.use(express.urlencoded({ extended: true }));
 // app.use(cookieParser());
 
 // TODO: define api routes here
+app.use('/api', apiRouter);
 
 // catch all for FE react routes
 app.get('/', (req, res) => {
