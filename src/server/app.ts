@@ -1,4 +1,4 @@
-// const path = require('path');
+import path from 'path';
 import express, { Express } from 'express';
 import { unknownEndpoint, globalErrorHandler } from './utils/middleware';
 
@@ -12,12 +12,11 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 // app.use(cookieParser());
 
-// TODO: define routes here
+// TODO: define api routes here
 
-// redirect to react UI
+// catch all for FE react routes
 app.get('/', (req, res) => {
-  // res.sendFile(path.resolve(__dirname, '../../client/index.html'));
-  res.send('testing');
+  res.sendFile(path.resolve(__dirname, '../client/index.html'));
 });
 
 app.use('/*', unknownEndpoint);
