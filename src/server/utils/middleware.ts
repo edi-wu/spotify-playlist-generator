@@ -1,19 +1,9 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { Request, Response, NextFunction } from 'express';
+// eslint-disable-next-line object-curly-newline
+import { Request, Response, NextFunction, RequestHandler } from 'express';
+import { ServerError } from '../types';
 
-export type ServerError = {
-  log: string;
-  status: number;
-  message: {
-    err: string;
-  };
-};
-
-export const unknownEndpoint = (
-  req: Request,
-  res: Response,
-  next: NextFunction
-): void => {
+export const unknownEndpoint: RequestHandler = (req, res, next) => {
   const endpointError: ServerError = {
     log: 'Request was made to an unavailable endpoint.',
     status: 404,
