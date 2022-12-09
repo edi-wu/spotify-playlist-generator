@@ -5,7 +5,12 @@ import OAuthPlaceholder from './routes/OAuthPlaceholder';
 import FormPage from './routes/FormPage';
 import WebPlayerPage from './routes/WebPlayerPage';
 
-const router = createBrowserRouter([
+type RoutesConfig = {
+  path: string;
+  element: JSX.Element;
+}[];
+
+export const routesConfig: RoutesConfig = [
   {
     path: '/',
     element: <Homepage />,
@@ -13,7 +18,9 @@ const router = createBrowserRouter([
   { path: '/oauth', element: <OAuthPlaceholder /> },
   { path: '/form', element: <FormPage /> },
   { path: '/player', element: <WebPlayerPage /> },
-]);
+];
+
+const router = createBrowserRouter(routesConfig);
 
 const App = () => <RouterProvider router={router} />;
 

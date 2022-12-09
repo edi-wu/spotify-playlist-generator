@@ -22,7 +22,7 @@ const OAuthPlaceholder = () => {
   };
   return (
     <>
-      <h1>This is the placeholder for oauth flow</h1>
+      <h1>Oauth placeholder</h1>
       <RedirectButton
         buttonText="Redirect to user input form"
         clickHandler={goToForm}

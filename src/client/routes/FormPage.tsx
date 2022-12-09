@@ -18,8 +18,7 @@ const RedirectButton = styled(Button)`
 const FormPage = () => {
   // TODO: if attempting to access this page before auth, should trigger redirect
   // implement by updating route with auth wrapper
-  // should pass redirect flag to homepage upon redirect to display message
-  // about auth to proceed
+  // should pass redirect flag to homepage upon redirect to display "auth required" message
   const navigate = useNavigate();
   const goToPlayer = (): void => {
     navigate('/player');
