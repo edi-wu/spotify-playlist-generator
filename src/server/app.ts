@@ -13,7 +13,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 // app.use(cookieParser());
 
-// TODO: define api routes here
+// API router
 app.use('/api', apiRouter);
 
 // catch all for FE react routes
