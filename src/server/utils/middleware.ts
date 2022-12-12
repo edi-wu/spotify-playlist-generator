@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 // eslint-disable-next-line object-curly-newline
-import { Request, Response, NextFunction, RequestHandler } from 'express';
+import { Request, Response, NextFunction, RequestHandler, ErrorRequestHandler } from 'express';
 import { ServerError } from '../types';
 
 export const unknownEndpoint: RequestHandler = (req, res, next) => {
@@ -12,12 +12,7 @@ export const unknownEndpoint: RequestHandler = (req, res, next) => {
   return next(endpointError);
 };
 
-export const globalErrorHandler = (
-  err: ServerError,
-  req: Request,
-  res: Response,
-  next: NextFunction
-): void => {
+export const globalErrorHandler: ErrorRequestHandler = (err, req, res, next) => {
   const defaultErr: ServerError = {
     log: 'Express error handler caught unknown middleware error.',
     status: 500,
