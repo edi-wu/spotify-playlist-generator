@@ -3,12 +3,15 @@ import oauthController from '../controllers/oauthController';
 
 const apiRouter: Router = express.Router();
 
-// TODO: route to redirect to oauth
-
+// Route to redirect to oauth
 apiRouter.get('/login', oauthController.generateRedirectUrl, oauthController.redirect);
 
-// TODO: route to obtain access token and set on cookie
-
-apiRouter.get('/getToken', (req, res) => {});
+// Route to obtain access token and set on cookie
+apiRouter.get(
+  '/getToken/:state',
+  oauthController.validateOAuth,
+  oauthController.generateToken,
+  oauthController.redirect
+);
 
 export default apiRouter;
