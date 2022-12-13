@@ -1,5 +1,6 @@
 import express, { Router } from 'express';
 import oauthController from '../controllers/oauthController';
+import { setCookies } from '../utils/middleware';
 
 const apiRouter: Router = express.Router();
 
@@ -11,6 +12,7 @@ apiRouter.get(
   '/getToken/:state',
   oauthController.validateOAuth,
   oauthController.generateToken,
+  setCookies,
   oauthController.redirect
 );
 

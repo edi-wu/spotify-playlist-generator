@@ -1,9 +1,15 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 // eslint-disable-next-line object-curly-newline
-import { Request, Response, NextFunction, RequestHandler, ErrorRequestHandler } from 'express';
+import { RequestHandler, ErrorRequestHandler } from 'express';
 import { ServerError } from '../types';
 
-export const unknownEndpoint: RequestHandler = (req, res, next) => {
+export const setCookies: RequestHandler = (req, res, next) => {
+  const cookiesObj = res.locals.cookies;
+  Object.keys(cookiesObj).forEach((key) => res.cookie(key, cookiesObj[key]));
+  return next();
+};
+
+export const unknownEndpointHandler: RequestHandler = (req, res, next) => {
   const endpointError: ServerError = {
     log: 'Request was made to an unavailable endpoint.',
     status: 404,

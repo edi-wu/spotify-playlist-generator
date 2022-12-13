@@ -1,5 +1,4 @@
 import querystring from 'querystring';
-import { Request } from 'express';
 import { Controller, OAuthQueryParams, ServerError } from '../types';
 import generateRandomString from '../utils/helpers';
 import spotifyApi from '../utils/apiWrapper';
@@ -67,7 +66,7 @@ oauthController.generateToken = async (req, res, next) => {
     const response = await spotifyApi.authorizationCodeGrant(res.locals.authCode);
     // eslint-disable-next-line @typescript-eslint/naming-convention
     const { access_token, refresh_token } = response.body;
-    res.cookie('access', access_token).cookie('refresh', refresh_token);
+    res.locals.cookies = { access: access_token, refresh: refresh_token };
     res.locals.redirectUrl = '/form';
     return next();
   } catch (err) {
