@@ -5,9 +5,7 @@ const apiRouter: Router = express.Router();
 
 // TODO: route to redirect to oauth
 
-apiRouter.get('/login', oauthController.generateRedirectUrl, (req, res) => {
-  res.status(302).redirect(res.locals.redirectUrl);
-});
+apiRouter.get('/login', oauthController.generateRedirectUrl, oauthController.redirect);
 
 // TODO: route to obtain access token and set on cookie
 

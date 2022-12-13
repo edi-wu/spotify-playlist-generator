@@ -33,4 +33,8 @@ oauthController.generateRedirectUrl = (req, res, next) => {
   return next();
 };
 
+oauthController.redirect = (req, res) => {
+  res.status(302).redirect(res.locals.redirectUrl);
+};
+
 export default oauthController;
