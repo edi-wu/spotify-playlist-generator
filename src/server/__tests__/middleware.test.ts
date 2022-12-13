@@ -1,46 +1,47 @@
-import { Server } from 'http';
-import { Request, Response, NextFunction } from 'express';
-import request from 'supertest';
-import app from '../app';
-import oauthController from '../controllers/oauthController';
+import httpMocks from 'node-mocks-http';
+import * as middleware from '../utils/middleware';
+import { ServerError } from '../types';
 
-jest.mock('../controllers/oauthController');
+const request = httpMocks.createRequest();
+const response = httpMocks.createResponse();
+const next = jest.fn();
 
-let server: Server;
-
-beforeAll(() => {
-  server = app.listen();
-});
-
-describe('testing error handling middleware', () => {
-  test('middleware should handle request to unknown endpoint', async () => {
-    const response: request.Response = await request(server).get(
-      '/impossible-endpoint'
-    );
-    expect(response.status).toBe(404);
+describe('testing middleware handlers', () => {
+  test('cookie setter should set all provided cookies', () => {
+    response.cookie = jest.fn();
+    response.locals.cookies = { cookie1: 'choco', cookie2: 'oatmeal', cookie3: 'gingerbread' };
+    middleware.setCookies(request, response, next);
     // eslint-disable-next-line no-prototype-builtins
-    expect(response.body.hasOwnProperty('err')).toBe(true);
+    expect(response.cookie).toHaveBeenCalledTimes(3);
+    expect(response.cookie).toHaveBeenNthCalledWith(1, 'cookie1', 'choco');
+    expect(response.cookie).toHaveBeenNthCalledWith(2, 'cookie2', 'oatmeal');
+    expect(response.cookie).toHaveBeenNthCalledWith(3, 'cookie3', 'gingerbread');
+    expect(next).toHaveBeenCalled();
   });
 
-  /* TODO LATER: once there are actual functioning routes, can test general
-  error handler by mocking a route callback to throw error
-  */
-  // test('middleware should catch unspecified server error', async () => {
-  //   const mockMiddlewareFn = jest.fn(oauthController.generateRedirectUrl);
-  //   mockMiddlewareFn.mockImplementation(
-  //     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  //     (req: Request, res: Response, next: NextFunction) => {
-  //       next(new Error('test error'));
-  //     }
-  //   );
-  //   const response: request.Response = await request(server).get('/api/login');
-  //   expect(response.status).toBe(500);
-  //   // eslint-disable-next-line no-prototype-builtins
-  //   expect(response.body.hasOwnProperty('err')).toBe(true);
-  //   expect(response.body.err).toBe('An error has occurred.');
-  // });
-});
+  test('unknown endpoint handler should call next function with error', () => {
+    middleware.unknownEndpointHandler(request, response, next);
+    expect(next).toHaveBeenCalledWith(
+      expect.objectContaining({
+        log: expect.any(String),
+        status: 404,
+        message: expect.objectContaining({ err: expect.any(String) }),
+      })
+    );
+  });
 
-afterAll(() => {
-  server.close();
+  test('global error handler should return correct error status and message', () => {
+    const customError: ServerError = {
+      log: 'testing error handler',
+      status: 417,
+      message: {
+        err: 'testing error handler',
+      },
+    };
+    middleware.globalErrorHandler(customError, request, response, next);
+    expect(response.statusCode).toBe(417);
+    // eslint-disable-next-line no-underscore-dangle
+    const sentData = JSON.parse(response._getData());
+    expect(sentData).toEqual({ err: 'testing error handler' });
+  });
 });
