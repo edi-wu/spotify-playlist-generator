@@ -4,11 +4,7 @@ import Homepage from './routes/Homepage';
 import OAuthRedirect from './routes/OAuthRedirect';
 import FormPage from './routes/FormPage';
 import WebPlayerPage from './routes/WebPlayerPage';
-
-type RoutesConfig = {
-  path: string;
-  element: JSX.Element;
-}[];
+import { RoutesConfig } from './types';
 
 export const routesConfig: RoutesConfig = [
   {
