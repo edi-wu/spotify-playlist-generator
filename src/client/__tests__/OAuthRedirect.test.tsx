@@ -8,7 +8,7 @@ import '@testing-library/jest-dom';
 import { BrowserRouter } from 'react-router-dom';
 import OAuthRedirect from '../routes/OAuthRedirect';
 
-describe('homepage rendering and navigation', () => {
+describe('oauth component rendering and navigation', () => {
   test('page should not render any content', () => {
     const { container } = render(<OAuthRedirect />, { wrapper: BrowserRouter });
     expect(container).toBeEmptyDOMElement();

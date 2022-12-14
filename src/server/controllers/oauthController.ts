@@ -71,7 +71,7 @@ oauthController.generateToken = async (req, res, next) => {
     const { access_token, refresh_token } = response.body;
     const cookiesObj: CookiesObj = { access: access_token, refresh: refresh_token };
     res.locals.cookies = cookiesObj;
-    res.locals.redirectUrl = '/form';
+    res.locals.redirectUrl = '/#/form';
     return next();
   } catch (err) {
     const tokenGenerationError: ServerError = {
