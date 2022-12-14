@@ -8,6 +8,8 @@ export type OAuthQueryParams = {
   state?: string;
 };
 
+export type CookiesObj = Record<string, string>;
+
 export type Controller = Record<string, RequestHandler>;
 
 export type ServerError = {

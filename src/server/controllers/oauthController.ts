@@ -1,5 +1,6 @@
 import querystring from 'querystring';
-import { Controller, OAuthQueryParams, ServerError } from '../types';
+// eslint-disable-next-line object-curly-newline
+import { Controller, CookiesObj, OAuthQueryParams, ServerError } from '../types';
 import generateRandomString from '../utils/helpers';
 import spotifyApi from '../utils/apiWrapper';
 
@@ -19,8 +20,7 @@ oauthController.generateRedirectUrl = (req, res, next) => {
   }
   const state: string = generateRandomString(16);
   const scope: string = 'playlist-modify-public';
-  // pass state string to next route via req.params
-  const redirectUri = `http://localhost:8080/api/getToken/${state}`;
+  const redirectUri = 'http://localhost:8080/api/getToken';
   const paramsObj: OAuthQueryParams = {
     client_id: clientId,
     redirect_uri: redirectUri,
@@ -31,6 +31,9 @@ oauthController.generateRedirectUrl = (req, res, next) => {
   const BASEURL: string = 'https://accounts.spotify.com/authorize?';
   const redirectUrl: string = BASEURL + querystring.stringify(paramsObj);
   res.locals.redirectUrl = redirectUrl;
+  // pass state string via cookies to next route
+  const cookiesObj: CookiesObj = { state };
+  res.locals.cookies = cookiesObj;
   return next();
 };
 
@@ -38,7 +41,7 @@ oauthController.validateOAuth = (req, res, next) => {
   const { state, error } = req.query;
   // casting code from req query as string
   const code = req.query.code as string;
-  const sentState: string = req.params.state;
+  const sentState: string = req.cookies.state;
   if (error || !code) {
     const authorizationError: ServerError = {
       log: `Spotify authorization failed. Error: ${error}`,
@@ -53,7 +56,7 @@ oauthController.validateOAuth = (req, res, next) => {
     const stateValidationError: ServerError = {
       log: 'State validation failed.',
       status: 500,
-      message: { err: 'An error has occurred: unable to verify Spotify as response origin.' },
+      message: { err: 'An error has occurred: unable to confirm Spotify as response origin.' },
     };
     return next(stateValidationError);
   }
@@ -66,7 +69,8 @@ oauthController.generateToken = async (req, res, next) => {
     const response = await spotifyApi.authorizationCodeGrant(res.locals.authCode);
     // eslint-disable-next-line @typescript-eslint/naming-convention
     const { access_token, refresh_token } = response.body;
-    res.locals.cookies = { access: access_token, refresh: refresh_token };
+    const cookiesObj: CookiesObj = { access: access_token, refresh: refresh_token };
+    res.locals.cookies = cookiesObj;
     res.locals.redirectUrl = '/form';
     return next();
   } catch (err) {

@@ -6,6 +6,11 @@ import spotifyApi from '../../utils/apiWrapper';
 const response = httpMocks.createResponse();
 const next = jest.fn();
 
+// clear response.locals object before each test to avoid properties persisting
+beforeEach(() => {
+  response.locals = {};
+});
+
 describe('testing middleware that generates Spotify OAuth redirect URL', () => {
   const OLD_ENV = process.env;
   const request = httpMocks.createRequest({
@@ -34,7 +39,7 @@ describe('testing middleware that generates Spotify OAuth redirect URL', () => {
     );
   });
 
-  test('middleware should add valid redirect URL to res.locals', () => {
+  test('middleware should add valid redirect URL and state string to res.locals', () => {
     process.env.CLIENT_ID = 'testclientid';
     oauthController.generateRedirectUrl(request, response, next);
     expect(response.locals).toHaveProperty('redirectUrl');
@@ -45,6 +50,10 @@ describe('testing middleware that generates Spotify OAuth redirect URL', () => {
     expect(redirectUrl).toMatch(/(scope)/);
     expect(redirectUrl).toMatch(/(state)/);
     expect(redirectUrl).toMatch(/(response_type=code)/);
+    expect(response.locals).toHaveProperty('cookies');
+    const { cookies } = response.locals;
+    expect(cookies).toHaveProperty('state');
+    expect(cookies.state.length).toBe(16);
     expect(next).toHaveBeenCalled();
   });
 });
@@ -54,7 +63,7 @@ describe('testing middleware that validates OAuth response', () => {
   const request = httpMocks.createRequest({
     method: 'GET',
     url: '/getToken',
-    params: { state },
+    cookies: { state },
   });
 
   test('middleware should throw error if missing state string', () => {

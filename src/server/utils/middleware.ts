@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 // eslint-disable-next-line object-curly-newline
 import { RequestHandler, ErrorRequestHandler } from 'express';
-import { ServerError } from '../types';
+import { CookiesObj, ServerError } from '../types';
 
 export const setCookies: RequestHandler = (req, res, next) => {
-  const cookiesObj = res.locals.cookies;
+  const cookiesObj: CookiesObj = res.locals.cookies;
   Object.keys(cookiesObj).forEach((key) => res.cookie(key, cookiesObj[key]));
   return next();
 };

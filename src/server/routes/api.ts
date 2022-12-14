@@ -5,11 +5,11 @@ import { setCookies } from '../utils/middleware';
 const apiRouter: Router = express.Router();
 
 // Route to redirect to oauth
-apiRouter.get('/login', oauthController.generateRedirectUrl, oauthController.redirect);
+apiRouter.get('/login', oauthController.generateRedirectUrl, setCookies, oauthController.redirect);
 
 // Route to obtain access token and set on cookie
 apiRouter.get(
-  '/getToken/:state',
+  '/getToken',
   oauthController.validateOAuth,
   oauthController.generateToken,
   setCookies,
