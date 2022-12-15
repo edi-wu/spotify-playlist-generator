@@ -1,19 +1,15 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { Request, Response, NextFunction } from 'express';
+// eslint-disable-next-line object-curly-newline
+import { RequestHandler, ErrorRequestHandler } from 'express';
+import { CookiesObj, ServerError } from '../types';
 
-export type ServerError = {
-  log: string;
-  status: number;
-  message: {
-    err: string;
-  };
+export const setCookies: RequestHandler = (req, res, next) => {
+  const cookiesObj: CookiesObj = res.locals.cookies;
+  Object.keys(cookiesObj).forEach((key) => res.cookie(key, cookiesObj[key]));
+  return next();
 };
 
-export const unknownEndpoint = (
-  req: Request,
-  res: Response,
-  next: NextFunction
-): void => {
+export const unknownEndpointHandler: RequestHandler = (req, res, next) => {
   const endpointError: ServerError = {
     log: 'Request was made to an unavailable endpoint.',
     status: 404,
@@ -22,12 +18,7 @@ export const unknownEndpoint = (
   return next(endpointError);
 };
 
-export const globalErrorHandler = (
-  err: ServerError,
-  req: Request,
-  res: Response,
-  next: NextFunction
-): void => {
+export const globalErrorHandler: ErrorRequestHandler = (err, req, res, next) => {
   const defaultErr: ServerError = {
     log: 'Express error handler caught unknown middleware error.',
     status: 500,
