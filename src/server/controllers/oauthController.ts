@@ -1,5 +1,4 @@
 import querystring from 'querystring';
-// eslint-disable-next-line object-curly-newline
 import { Controller, CookiesObj, OAuthQueryParams, ServerError } from '../types';
 import generateRandomString from '../utils/helpers';
 import spotifyApi from '../utils/apiWrapper';
