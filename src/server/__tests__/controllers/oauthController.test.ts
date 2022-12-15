@@ -162,7 +162,7 @@ describe('testing middleware that obtains access token', () => {
     expect(response.locals).toHaveProperty('cookies');
     expect(response.locals.cookies).toEqual({ access: 'test-access', refresh: 'test-refresh' });
     expect(response.locals).toHaveProperty('redirectUrl');
-    expect(response.locals.redirectUrl).toBe('/form');
+    expect(response.locals.redirectUrl).toBe('/#/form');
     expect(next).toHaveBeenCalled();
   });
 });
