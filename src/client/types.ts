@@ -16,6 +16,11 @@ export type InputProps = {
   options?: string[];
 };
 
+export type AlertProps = {
+  className?: string;
+  message: string;
+};
+
 export type FormData = {
   title: string;
   description: string;
