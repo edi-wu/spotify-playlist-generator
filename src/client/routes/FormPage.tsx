@@ -4,6 +4,8 @@ import styled from 'styled-components';
 import Button from '../components/Button';
 import TextInput from '../components/TextInput';
 import DropDownMenu from '../components/DropDownMenu';
+import Alert from '../components/Alert';
+import isPositiveIntegerString from '../utils/inputValidation';
 import { FormData } from '../types';
 import SPOTIFY_GENRE_SEEDS from '../constants';
 
@@ -24,8 +26,7 @@ const SubmitButton = styled(Button)`
 `;
 
 const FormPage = () => {
-  // NB will need to convert duration inputs to numbers
-  // will need to validate user input is int
+  // NB will need to convert duration inputs to numbers -- do it on BE?
   const [formData, setFormData] = useState<FormData>({
     title: '',
     description: '',
@@ -33,20 +34,30 @@ const FormPage = () => {
     durationMinutes: '',
     genres: '',
   });
+  const [isValidInput, setIsValidInput] = useState<boolean>(true);
   const navigate = useNavigate();
   const goToPlayer = (): void => {
     navigate('/player');
   };
 
+  // NB state is still updated in case of invalid input; need to check flag before making api call
   const handleFormInput: ChangeEventHandler<HTMLInputElement> = (event) => {
     const sourceName = event.target.name;
-    setFormData({ ...formData, [sourceName]: event.target.value });
-    console.log(formData);
+    const sourceValue = event.target.value;
+    if (sourceName === 'durationHours' || sourceName === 'durationMinutes') {
+      if (!isPositiveIntegerString(sourceValue)) {
+        setIsValidInput(false);
+      } else {
+        setIsValidInput(true);
+      }
+    }
+    setFormData({ ...formData, [sourceName]: sourceValue });
   };
 
   const handleDropDownInput: ChangeEventHandler<HTMLSelectElement> = (event) => {
-    console.log('handling dropdown input yeah', event.target.value);
-    setFormData({ ...formData, [event.target.name]: event.target.value });
+    const sourceName = event.target.name;
+    const sourceValue = event.target.value;
+    setFormData({ ...formData, [sourceName]: sourceValue });
   };
 
   return (
@@ -66,19 +77,24 @@ const FormPage = () => {
         changeHandler={handleFormInput}
       />
       <br />
+      playlist length
       <TextInput
-        label="playlist length"
+        label="hour(s)"
         name="durationHours"
         value={formData.durationHours}
         changeHandler={handleFormInput}
+        fieldBeforeLabel
       />
-      <span>hours</span>
       <TextInput
+        label="minutes"
         name="durationMinutes"
         value={formData.durationMinutes}
         changeHandler={handleFormInput}
+        fieldBeforeLabel
       />
-      <span>minutes</span>
+      {isValidInput ? null : (
+        <Alert message="Please input positive integers for playlist duration" />
+      )}
       <br />
       <DropDownMenu
         label="genres"
@@ -86,7 +102,7 @@ const FormPage = () => {
         name="genres"
         value={formData.genres}
         changeHandler={handleDropDownInput}
-        options={SPOTIFY_GENRE_SEEDS}
+        menuOptions={SPOTIFY_GENRE_SEEDS}
       />
       <br />
       <SubmitButton buttonText="Generate my playlist" clickHandler={goToPlayer} />
