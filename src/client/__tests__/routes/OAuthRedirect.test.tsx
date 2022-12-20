@@ -2,15 +2,14 @@
  * @jest-environment jsdom
  */
 
-import { render } from '@testing-library/react';
 import React from 'react';
 import '@testing-library/jest-dom';
-import { BrowserRouter } from 'react-router-dom';
-import OAuthRedirect from '../routes/OAuthRedirect';
+import setup from '../setup';
+import OAuthRedirect from '../../routes/OAuthRedirect';
 
 describe('oauth component rendering and navigation', () => {
   test('page should not render any content', () => {
-    const { container } = render(<OAuthRedirect />, { wrapper: BrowserRouter });
+    const { container } = setup(<OAuthRedirect />);
     expect(container).toBeEmptyDOMElement();
   });
 
@@ -22,7 +21,7 @@ describe('oauth component rendering and navigation', () => {
       },
       writable: true,
     });
-    render(<OAuthRedirect />, { wrapper: BrowserRouter });
+    setup(<OAuthRedirect />);
     expect(mockReplace).toHaveBeenCalled();
     expect(mockReplace).toHaveBeenCalledWith('http://localhost:8080/api/login');
   });

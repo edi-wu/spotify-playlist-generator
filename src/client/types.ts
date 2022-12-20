@@ -13,7 +13,8 @@ export type InputProps = {
   name: string;
   value: string;
   changeHandler: ChangeEventHandler<HTMLInputElement | HTMLSelectElement>;
-  options?: string[];
+  fieldBeforeLabel?: boolean;
+  menuOptions?: string[];
 };
 
 export type AlertProps = {
