@@ -7,12 +7,19 @@ import React from 'react';
 import '@testing-library/jest-dom';
 import setup from '../setup';
 import FormPage from '../../routes/FormPage';
+import generatePlaylist from '../../services/playlist';
 import SPOTIFY_GENRE_SEEDS from '../../constants';
 
 // TODO: later, test calling api from user input and click
 // TODO: look into setup/teardown for FE to avoid contamination
 
-describe('testing input form rendering', () => {
+jest.mock('../../services/playlist');
+
+afterEach(() => {
+  jest.clearAllMocks();
+});
+
+describe('testing form rendering', () => {
   test('page should display title and playlist generation button', () => {
     setup(<FormPage />);
     expect(screen.getByText(/user input form/i)).toBeInTheDocument();
@@ -26,8 +33,7 @@ describe('testing input form rendering', () => {
     expect(screen.getByLabelText('description')).toBeInTheDocument();
     expect(screen.getByLabelText('hour(s)')).toBeInTheDocument();
     expect(screen.getByLabelText('minutes')).toBeInTheDocument();
-    const fields = screen.getAllByRole('textbox');
-    expect(fields.length).toBe(4);
+    expect(screen.getAllByRole('textbox').length).toBe(4);
     expect(screen.getByRole('combobox', { name: /genres/i })).toBeInTheDocument();
   });
 
@@ -36,32 +42,179 @@ describe('testing input form rendering', () => {
     const genreOptions = screen.getAllByTestId('menuOption');
     expect(genreOptions.length).toBe(SPOTIFY_GENRE_SEEDS.length);
   });
+
+  test('page should render user input', async () => {
+    const { user } = setup(<FormPage />, { withUser: true });
+
+    await user?.type(screen.getByLabelText('title'), 'my playlist');
+    await user?.type(screen.getByLabelText('description'), 'a very good playlist');
+    await user?.type(screen.getByLabelText('hour(s)'), 'eleven');
+    await user?.type(screen.getByLabelText('minutes'), '11');
+    await user?.selectOptions(screen.getByLabelText('genres'), SPOTIFY_GENRE_SEEDS[0]);
+    expect(screen.getByDisplayValue('my playlist')).toBeInTheDocument();
+    expect(screen.getByDisplayValue('a very good playlist')).toBeInTheDocument();
+    expect(screen.getByDisplayValue('eleven')).toBeInTheDocument();
+    expect(screen.getByDisplayValue('11')).toBeInTheDocument();
+    expect(
+      (screen.getByText(`${SPOTIFY_GENRE_SEEDS[0]}`) as HTMLOptionElement).selected
+    ).toBeTruthy();
+  });
 });
 
-describe('testing input form interactivity', () => {
-  describe('invalid playlist duration should trigger alert to display', () => {
+describe('testing form validation and submission', () => {
+  test('no alerts should display on initial render', () => {
+    setup(<FormPage />);
+    expect(screen.queryByTestId('alertMessage')).toBe(null);
+  });
+  describe('testing invalid playlist duration alert', () => {
     test('alert should display for invalid hours', async () => {
       const { user } = setup(<FormPage />, { withUser: true });
-      const textbox = screen.getByLabelText('hour(s)');
-      await user?.type(textbox, 'eleven');
+
+      await user?.type(screen.getByLabelText('hour(s)'), 'eleven');
       expect(screen.getByTestId('alertMessage')).toBeInTheDocument();
-      expect(
-        screen.getByText('Please input positive integers for playlist duration')
-      ).toBeInTheDocument();
+      expect(screen.getByText('Please enter numbers for playlist length')).toBeInTheDocument();
     });
     test('alert should display for invalid minutes', async () => {
       const { user } = setup(<FormPage />, { withUser: true });
-      const textbox = screen.getByLabelText('minutes');
+
+      await user?.type(screen.getByLabelText('minutes'), 'eleven');
+      expect(screen.getByTestId('alertMessage')).toBeInTheDocument();
+      expect(screen.getByText('Please enter numbers for playlist length')).toBeInTheDocument();
+    });
+    test('hours and minutes should be validated indepedently', async () => {
+      const { user } = setup(<FormPage />, { withUser: true });
+
+      await user?.type(screen.getByLabelText('hour(s)'), 'eleven');
+      expect(screen.getByTestId('alertMessage')).toBeInTheDocument();
+      expect(screen.getByText('Please enter numbers for playlist length')).toBeInTheDocument();
+
+      await user?.type(screen.getByLabelText('minutes'), '11');
+      expect(screen.getByTestId('alertMessage')).toBeInTheDocument();
+      expect(screen.getByText('Please enter numbers for playlist length')).toBeInTheDocument();
+    });
+    test('alert should disappear when user clears invalid input', async () => {
+      const { user } = setup(<FormPage />, { withUser: true });
+      const textbox = screen.getByLabelText('hour(s)');
+
       await user?.type(textbox, 'eleven');
       expect(screen.getByTestId('alertMessage')).toBeInTheDocument();
-      expect(
-        screen.getByText('Please input positive integers for playlist duration')
-      ).toBeInTheDocument();
+      expect(screen.getByText('Please enter numbers for playlist length')).toBeInTheDocument();
+
+      await user?.clear(textbox);
+      expect(screen.queryByTestId('alertMessage')).toBe(null);
     });
   });
-  test('submit button should redirect to web player', async () => {
+  describe('testing missing playlist duration alert on submit', () => {
+    test('alert should display if both input fields are empty', async () => {
+      const { user } = setup(<FormPage />, { withUser: true });
+
+      await user?.selectOptions(screen.getByLabelText('genres'), SPOTIFY_GENRE_SEEDS[0]);
+      await user?.click(screen.getByText(/generate my playlist/i));
+      expect(screen.getByTestId('alertMessage')).toBeInTheDocument();
+      expect(
+        screen.getByText('Please specify at least one valid value for playlist length')
+      ).toBeInTheDocument();
+    });
+    test('alert should display if input fields only contain 0', async () => {
+      const { user } = setup(<FormPage />, { withUser: true });
+
+      await user?.selectOptions(screen.getByLabelText('genres'), SPOTIFY_GENRE_SEEDS[0]);
+      await user?.type(screen.getByLabelText('hour(s)'), '0');
+      await user?.click(screen.getByText(/generate my playlist/i));
+      expect(screen.getByTestId('alertMessage')).toBeInTheDocument();
+      expect(
+        screen.getByText('Please specify at least one valid value for playlist length')
+      ).toBeInTheDocument();
+
+      await user?.type(screen.getByLabelText('minutes'), '0');
+      await user?.click(screen.getByText(/generate my playlist/i));
+      expect(screen.getByTestId('alertMessage')).toBeInTheDocument();
+      expect(
+        screen.getByText('Please specify at least one valid value for playlist length')
+      ).toBeInTheDocument();
+    });
+    test('both input error alerts should display in case of invalid input', async () => {
+      const { user } = setup(<FormPage />, { withUser: true });
+
+      await user?.selectOptions(screen.getByLabelText('genres'), SPOTIFY_GENRE_SEEDS[0]);
+      await user?.type(screen.getByLabelText('hour(s)'), 'eleven');
+      await user?.click(screen.getByText(/generate my playlist/i));
+      expect(screen.getAllByTestId('alertMessage').length).toBe(2);
+      expect(screen.getByText('Please enter numbers for playlist length')).toBeInTheDocument();
+      expect(
+        screen.getByText('Please specify at least one valid value for playlist length')
+      ).toBeInTheDocument();
+    });
+    test('alert should not display for valid inputs', async () => {
+      const { user } = setup(<FormPage />, { withUser: true });
+
+      await user?.selectOptions(screen.getByLabelText('genres'), SPOTIFY_GENRE_SEEDS[0]);
+      await user?.type(screen.getByLabelText('hour(s)'), '1');
+      await user?.click(screen.getByText(/generate my playlist/i));
+      expect(screen.queryByTestId('alertMessage')).toBe(null);
+      expect(
+        screen.queryByText('Please specify at least one valid value for playlist length')
+      ).toBe(null);
+
+      await user?.type(screen.getByLabelText('minutes'), '1');
+      await user?.click(screen.getByText(/generate my playlist/i));
+      expect(screen.queryByTestId('alertMessage')).toBe(null);
+      expect(
+        screen.queryByText('Please specify at least one valid value for playlist length')
+      ).toBe(null);
+    });
+  });
+  describe('testing missing genre selection alert on submit', () => {
+    test('alert should display if no genre is selected', async () => {
+      const { user } = setup(<FormPage />, { withUser: true });
+
+      await user?.type(screen.getByLabelText('minutes'), '10');
+      await user?.click(screen.getByText(/generate my playlist/i));
+      expect(screen.getByTestId('alertMessage')).toBeInTheDocument();
+      expect(screen.getByText('Please select a genre to proceed')).toBeInTheDocument();
+    });
+    test('alert should not display if a genre is selected', async () => {
+      const { user } = setup(<FormPage />, { withUser: true });
+
+      await user?.type(screen.getByLabelText('minutes'), '10');
+      await user?.selectOptions(screen.getByLabelText('genres'), SPOTIFY_GENRE_SEEDS[0]);
+      await user?.click(screen.getByText(/generate my playlist/i));
+      expect(screen.queryByTestId('alertMessage')).toBe(null);
+      expect(screen.queryByText('Please select a genre to proceed')).toBe(null);
+    });
+  });
+  test('submission handler should not make api request if any required input is missing or invalid', async () => {
     const { user } = setup(<FormPage />, { withUser: true });
+
     await user?.click(screen.getByText(/generate my playlist/i));
+    expect(generatePlaylist).not.toHaveBeenCalled();
+
+    await user?.type(screen.getByLabelText('minutes'), '10');
+    await user?.click(screen.getByText(/generate my playlist/i));
+    expect(generatePlaylist).not.toHaveBeenCalled();
+
+    await user?.clear(screen.getByLabelText('minutes'));
+    await user?.selectOptions(screen.getByLabelText('genres'), SPOTIFY_GENRE_SEEDS[0]);
+    await user?.click(screen.getByText(/generate my playlist/i));
+    expect(generatePlaylist).not.toHaveBeenCalled();
+  });
+  test('if input is valid, submission should make api call and redirect to web player', async () => {
+    const { user } = setup(<FormPage />, { withUser: true });
+
+    await user?.type(screen.getByLabelText('title'), 'my playlist');
+    await user?.type(screen.getByLabelText('description'), 'a very good playlist');
+    await user?.type(screen.getByLabelText('minutes'), '10');
+    await user?.selectOptions(screen.getByLabelText('genres'), SPOTIFY_GENRE_SEEDS[0]);
+    await user?.click(screen.getByText(/generate my playlist/i));
+    expect(generatePlaylist).toHaveBeenCalledWith(
+      expect.objectContaining({
+        title: expect.any(String),
+        description: expect.any(String),
+        durationHours: expect.any(String),
+        durationMinutes: expect.any(String),
+        genres: expect.any(String),
+      })
+    );
     expect(window.location.pathname).toBe('/player');
   });
 });

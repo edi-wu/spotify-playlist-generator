@@ -1,4 +1,4 @@
-import React, { useState, ChangeEventHandler } from 'react';
+import React, { useState, ChangeEventHandler, MouseEventHandler } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import Button from '../components/Button';
@@ -6,12 +6,9 @@ import TextInput from '../components/TextInput';
 import DropDownMenu from '../components/DropDownMenu';
 import Alert from '../components/Alert';
 import isPositiveIntegerString from '../utils/inputValidation';
+import generatePlaylist from '../services/playlist';
 import { FormData } from '../types';
 import SPOTIFY_GENRE_SEEDS from '../constants';
-
-// TODO: if attempting to access this page before auth, should trigger redirect
-// implement by updating route with auth wrapper
-// should pass redirect flag to homepage upon redirect to display "auth required" message
 
 const SubmitButton = styled(Button)`
   background-color: pink;
@@ -27,6 +24,7 @@ const SubmitButton = styled(Button)`
 
 const FormPage = () => {
   // NB will need to convert duration inputs to numbers -- do it on BE?
+  const navigate = useNavigate();
   const [formData, setFormData] = useState<FormData>({
     title: '',
     description: '',
@@ -34,30 +32,57 @@ const FormPage = () => {
     durationMinutes: '',
     genres: '',
   });
-  const [isValidInput, setIsValidInput] = useState<boolean>(true);
-  const navigate = useNavigate();
-  const goToPlayer = (): void => {
-    navigate('/player');
-  };
+  const [invalidHours, setInvalidHours] = useState<boolean>(false);
+  const [invalidMinutes, setInvalidMinutes] = useState<boolean>(false);
+  const [missingDuration, setMissingDuration] = useState<boolean>(true);
+  const [missingGenre, setMissingGenre] = useState<boolean>(true);
+  const [hasClicked, setHasClicked] = useState<boolean>(false);
 
-  // NB state is still updated in case of invalid input; need to check flag before making api call
-  const handleFormInput: ChangeEventHandler<HTMLInputElement> = (event) => {
+  const handleFormInput: ChangeEventHandler<HTMLInputElement | HTMLSelectElement> = (event) => {
     const sourceName = event.target.name;
     const sourceValue = event.target.value;
-    if (sourceName === 'durationHours' || sourceName === 'durationMinutes') {
+    if (sourceName === 'durationHours') {
       if (!isPositiveIntegerString(sourceValue)) {
-        setIsValidInput(false);
+        setInvalidHours(true);
       } else {
-        setIsValidInput(true);
+        setInvalidHours(false);
+      }
+    }
+    if (sourceName === 'durationMinutes') {
+      if (!isPositiveIntegerString(sourceValue)) {
+        setInvalidMinutes(true);
+      } else {
+        setInvalidMinutes(false);
       }
     }
     setFormData({ ...formData, [sourceName]: sourceValue });
   };
 
-  const handleDropDownInput: ChangeEventHandler<HTMLSelectElement> = (event) => {
-    const sourceName = event.target.name;
-    const sourceValue = event.target.value;
-    setFormData({ ...formData, [sourceName]: sourceValue });
+  const handleSubmit: MouseEventHandler<HTMLButtonElement> = (event) => {
+    event.preventDefault();
+    let validationPassed = true;
+    setHasClicked(true);
+    if (!formData.genres) {
+      setMissingGenre(true);
+      validationPassed = false;
+    } else {
+      setMissingGenre(false);
+    }
+    if (!parseInt(formData.durationHours, 10) && !parseInt(formData.durationMinutes, 10)) {
+      setMissingDuration(true);
+      validationPassed = false;
+    } else {
+      setMissingDuration(false);
+    }
+    if (invalidHours || invalidMinutes) {
+      validationPassed = false;
+    }
+    if (!validationPassed) {
+      return;
+    }
+    // expect playlist id string to come back; if error, cb can return error string instead for handling
+    const playlistId = generatePlaylist(formData);
+    navigate('/player', { state: { playlistId } });
   };
 
   return (
@@ -92,20 +117,24 @@ const FormPage = () => {
         changeHandler={handleFormInput}
         fieldBeforeLabel
       />
-      {isValidInput ? null : (
-        <Alert message="Please input positive integers for playlist duration" />
-      )}
+      {invalidHours || invalidMinutes ? (
+        <Alert message="Please enter numbers for playlist length" />
+      ) : null}
+      {hasClicked && missingDuration ? (
+        <Alert message="Please specify at least one valid value for playlist length" />
+      ) : null}
       <br />
       <DropDownMenu
         label="genres"
         defaultOptionLabel="select a genre"
         name="genres"
         value={formData.genres}
-        changeHandler={handleDropDownInput}
+        changeHandler={handleFormInput}
         menuOptions={SPOTIFY_GENRE_SEEDS}
       />
+      {hasClicked && missingGenre ? <Alert message="Please select a genre to proceed" /> : null}
       <br />
-      <SubmitButton buttonText="Generate my playlist" clickHandler={goToPlayer} />
+      <SubmitButton buttonText="Generate my playlist" clickHandler={handleSubmit} />
     </>
   );
 };

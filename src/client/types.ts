@@ -1,9 +1,9 @@
-import React, { ChangeEventHandler } from 'react';
+import { ChangeEventHandler, MouseEventHandler } from 'react';
 
 export type ButtonProps = {
   className?: string;
   buttonText: string;
-  clickHandler: (event?: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
+  clickHandler: MouseEventHandler<HTMLButtonElement>;
 };
 
 export type InputProps = {
