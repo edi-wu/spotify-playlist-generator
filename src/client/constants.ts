@@ -1,4 +1,4 @@
-const SPOTIFY_GENRE_SEEDS = [
+export const SPOTIFY_GENRE_SEEDS: string[] = [
   'acoustic',
   'afrobeat',
   'alt-rock',
@@ -127,4 +127,8 @@ const SPOTIFY_GENRE_SEEDS = [
   'world-music',
 ];
 
-export default SPOTIFY_GENRE_SEEDS;
+export const ERROR_MESSAGES: Record<string, string> = {
+  invalidDuration: 'Please enter numbers for playlist length',
+  missingDuration: 'Please specify at least one valid value for playlist length',
+  missingGenre: 'Please select a genre to proceed',
+};

@@ -8,7 +8,7 @@ import { screen } from '@testing-library/react';
 import React from 'react';
 import '@testing-library/jest-dom';
 import Homepage from '../../routes/Homepage';
-import setup from '../setup';
+import setup from '../../utils/testSetup';
 
 describe('homepage rendering and navigation', () => {
   test('page should display title and login button', () => {

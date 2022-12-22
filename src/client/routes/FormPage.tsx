@@ -8,7 +8,7 @@ import Alert from '../components/Alert';
 import isPositiveIntegerString from '../utils/inputValidation';
 import generatePlaylist from '../services/playlist';
 import { FormData } from '../types';
-import SPOTIFY_GENRE_SEEDS from '../constants';
+import { SPOTIFY_GENRE_SEEDS, ERROR_MESSAGES } from '../constants';
 
 const SubmitButton = styled(Button)`
   background-color: pink;
@@ -117,12 +117,8 @@ const FormPage = () => {
         changeHandler={handleFormInput}
         fieldBeforeLabel
       />
-      {invalidHours || invalidMinutes ? (
-        <Alert message="Please enter numbers for playlist length" />
-      ) : null}
-      {hasClicked && missingDuration ? (
-        <Alert message="Please specify at least one valid value for playlist length" />
-      ) : null}
+      {invalidHours || invalidMinutes ? <Alert message={ERROR_MESSAGES.invalidDuration} /> : null}
+      {hasClicked && missingDuration ? <Alert message={ERROR_MESSAGES.missingDuration} /> : null}
       <br />
       <DropDownMenu
         label="genres"
@@ -132,7 +128,7 @@ const FormPage = () => {
         changeHandler={handleFormInput}
         menuOptions={SPOTIFY_GENRE_SEEDS}
       />
-      {hasClicked && missingGenre ? <Alert message="Please select a genre to proceed" /> : null}
+      {hasClicked && missingGenre ? <Alert message={ERROR_MESSAGES.missingGenre} /> : null}
       <br />
       <SubmitButton buttonText="Generate my playlist" clickHandler={handleSubmit} />
     </>

@@ -5,13 +5,10 @@
 import { screen } from '@testing-library/react';
 import React from 'react';
 import '@testing-library/jest-dom';
-import setup from '../setup';
+import setup from '../../utils/testSetup';
 import FormPage from '../../routes/FormPage';
 import generatePlaylist from '../../services/playlist';
-import SPOTIFY_GENRE_SEEDS from '../../constants';
-
-// TODO: later, test calling api from user input and click
-// TODO: look into setup/teardown for FE to avoid contamination
+import { SPOTIFY_GENRE_SEEDS, ERROR_MESSAGES } from '../../constants';
 
 jest.mock('../../services/playlist');
 
@@ -72,25 +69,25 @@ describe('testing form validation and submission', () => {
 
       await user?.type(screen.getByLabelText('hour(s)'), 'eleven');
       expect(screen.getByTestId('alertMessage')).toBeInTheDocument();
-      expect(screen.getByText('Please enter numbers for playlist length')).toBeInTheDocument();
+      expect(screen.getByText(`${ERROR_MESSAGES.invalidDuration}`)).toBeInTheDocument();
     });
     test('alert should display for invalid minutes', async () => {
       const { user } = setup(<FormPage />, { withUser: true });
 
       await user?.type(screen.getByLabelText('minutes'), 'eleven');
       expect(screen.getByTestId('alertMessage')).toBeInTheDocument();
-      expect(screen.getByText('Please enter numbers for playlist length')).toBeInTheDocument();
+      expect(screen.getByText(`${ERROR_MESSAGES.invalidDuration}`)).toBeInTheDocument();
     });
     test('hours and minutes should be validated indepedently', async () => {
       const { user } = setup(<FormPage />, { withUser: true });
 
       await user?.type(screen.getByLabelText('hour(s)'), 'eleven');
       expect(screen.getByTestId('alertMessage')).toBeInTheDocument();
-      expect(screen.getByText('Please enter numbers for playlist length')).toBeInTheDocument();
+      expect(screen.getByText(`${ERROR_MESSAGES.invalidDuration}`)).toBeInTheDocument();
 
       await user?.type(screen.getByLabelText('minutes'), '11');
       expect(screen.getByTestId('alertMessage')).toBeInTheDocument();
-      expect(screen.getByText('Please enter numbers for playlist length')).toBeInTheDocument();
+      expect(screen.getByText(`${ERROR_MESSAGES.invalidDuration}`)).toBeInTheDocument();
     });
     test('alert should disappear when user clears invalid input', async () => {
       const { user } = setup(<FormPage />, { withUser: true });
@@ -98,7 +95,7 @@ describe('testing form validation and submission', () => {
 
       await user?.type(textbox, 'eleven');
       expect(screen.getByTestId('alertMessage')).toBeInTheDocument();
-      expect(screen.getByText('Please enter numbers for playlist length')).toBeInTheDocument();
+      expect(screen.getByText(`${ERROR_MESSAGES.invalidDuration}`)).toBeInTheDocument();
 
       await user?.clear(textbox);
       expect(screen.queryByTestId('alertMessage')).toBe(null);
@@ -111,9 +108,7 @@ describe('testing form validation and submission', () => {
       await user?.selectOptions(screen.getByLabelText('genres'), SPOTIFY_GENRE_SEEDS[0]);
       await user?.click(screen.getByText(/generate my playlist/i));
       expect(screen.getByTestId('alertMessage')).toBeInTheDocument();
-      expect(
-        screen.getByText('Please specify at least one valid value for playlist length')
-      ).toBeInTheDocument();
+      expect(screen.getByText(`${ERROR_MESSAGES.missingDuration}`)).toBeInTheDocument();
     });
     test('alert should display if input fields only contain 0', async () => {
       const { user } = setup(<FormPage />, { withUser: true });
@@ -122,16 +117,12 @@ describe('testing form validation and submission', () => {
       await user?.type(screen.getByLabelText('hour(s)'), '0');
       await user?.click(screen.getByText(/generate my playlist/i));
       expect(screen.getByTestId('alertMessage')).toBeInTheDocument();
-      expect(
-        screen.getByText('Please specify at least one valid value for playlist length')
-      ).toBeInTheDocument();
+      expect(screen.getByText(`${ERROR_MESSAGES.missingDuration}`)).toBeInTheDocument();
 
       await user?.type(screen.getByLabelText('minutes'), '0');
       await user?.click(screen.getByText(/generate my playlist/i));
       expect(screen.getByTestId('alertMessage')).toBeInTheDocument();
-      expect(
-        screen.getByText('Please specify at least one valid value for playlist length')
-      ).toBeInTheDocument();
+      expect(screen.getByText(`${ERROR_MESSAGES.missingDuration}`)).toBeInTheDocument();
     });
     test('both input error alerts should display in case of invalid input', async () => {
       const { user } = setup(<FormPage />, { withUser: true });
@@ -140,10 +131,8 @@ describe('testing form validation and submission', () => {
       await user?.type(screen.getByLabelText('hour(s)'), 'eleven');
       await user?.click(screen.getByText(/generate my playlist/i));
       expect(screen.getAllByTestId('alertMessage').length).toBe(2);
-      expect(screen.getByText('Please enter numbers for playlist length')).toBeInTheDocument();
-      expect(
-        screen.getByText('Please specify at least one valid value for playlist length')
-      ).toBeInTheDocument();
+      expect(screen.getByText(`${ERROR_MESSAGES.invalidDuration}`)).toBeInTheDocument();
+      expect(screen.getByText(`${ERROR_MESSAGES.missingDuration}`)).toBeInTheDocument();
     });
     test('alert should not display for valid inputs', async () => {
       const { user } = setup(<FormPage />, { withUser: true });
@@ -152,16 +141,12 @@ describe('testing form validation and submission', () => {
       await user?.type(screen.getByLabelText('hour(s)'), '1');
       await user?.click(screen.getByText(/generate my playlist/i));
       expect(screen.queryByTestId('alertMessage')).toBe(null);
-      expect(
-        screen.queryByText('Please specify at least one valid value for playlist length')
-      ).toBe(null);
+      expect(screen.queryByText(`${ERROR_MESSAGES.missingDuration}`)).toBe(null);
 
       await user?.type(screen.getByLabelText('minutes'), '1');
       await user?.click(screen.getByText(/generate my playlist/i));
       expect(screen.queryByTestId('alertMessage')).toBe(null);
-      expect(
-        screen.queryByText('Please specify at least one valid value for playlist length')
-      ).toBe(null);
+      expect(screen.queryByText(`${ERROR_MESSAGES.missingDuration}`)).toBe(null);
     });
   });
   describe('testing missing genre selection alert on submit', () => {
@@ -171,7 +156,7 @@ describe('testing form validation and submission', () => {
       await user?.type(screen.getByLabelText('minutes'), '10');
       await user?.click(screen.getByText(/generate my playlist/i));
       expect(screen.getByTestId('alertMessage')).toBeInTheDocument();
-      expect(screen.getByText('Please select a genre to proceed')).toBeInTheDocument();
+      expect(screen.getByText(`${ERROR_MESSAGES.missingGenre}`)).toBeInTheDocument();
     });
     test('alert should not display if a genre is selected', async () => {
       const { user } = setup(<FormPage />, { withUser: true });
@@ -180,7 +165,7 @@ describe('testing form validation and submission', () => {
       await user?.selectOptions(screen.getByLabelText('genres'), SPOTIFY_GENRE_SEEDS[0]);
       await user?.click(screen.getByText(/generate my playlist/i));
       expect(screen.queryByTestId('alertMessage')).toBe(null);
-      expect(screen.queryByText('Please select a genre to proceed')).toBe(null);
+      expect(screen.queryByText(`${ERROR_MESSAGES.missingGenre}`)).toBe(null);
     });
   });
   test('submission handler should not make api request if any required input is missing or invalid', async () => {

@@ -12,9 +12,7 @@ describe('initial app rendering and navigation', () => {
   test('app should render homepage at start', () => {
     render(<App />);
     expect(screen.getByText(/axolotl beats/i)).toBeInTheDocument();
-    expect(
-      screen.getByRole('button', { name: /login with spotify/i })
-    ).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /login with spotify/i })).toBeInTheDocument();
   });
   // TODO: test below should be revised to ensure that access to routes is blocked if not auth'ed
   test('direct access to available route should render', () => {

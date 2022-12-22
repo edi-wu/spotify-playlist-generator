@@ -4,7 +4,7 @@
 
 import React from 'react';
 import '@testing-library/jest-dom';
-import setup from '../setup';
+import setup from '../../utils/testSetup';
 import OAuthRedirect from '../../routes/OAuthRedirect';
 
 describe('oauth component rendering and navigation', () => {
