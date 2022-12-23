@@ -82,8 +82,8 @@ const FormPage = () => {
     }
     const serverResponse: string | Error = await generatePlaylist(formData);
     if (serverResponse instanceof Error) {
-      // go to some error page here...
       console.log('returned error: ', serverResponse);
+      navigate('/error', { state: { error: serverResponse } });
       return;
     }
     navigate('/player', { state: { playlistId: serverResponse } });

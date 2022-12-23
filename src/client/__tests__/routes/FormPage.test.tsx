@@ -61,6 +61,7 @@ describe('testing form validation and submission', () => {
     setup(<FormPage />);
     expect(screen.queryByTestId('alertMessage')).toBe(null);
   });
+
   describe('testing invalid playlist duration alert', () => {
     test('alert should display for invalid hours', async () => {
       const { user } = setup(<FormPage />, { withUser: true });
@@ -69,6 +70,7 @@ describe('testing form validation and submission', () => {
       expect(screen.getByTestId('alertMessage')).toBeInTheDocument();
       expect(screen.getByText(`${ERROR_MESSAGES.invalidDuration}`)).toBeInTheDocument();
     });
+
     test('alert should display for invalid minutes', async () => {
       const { user } = setup(<FormPage />, { withUser: true });
 
@@ -76,6 +78,7 @@ describe('testing form validation and submission', () => {
       expect(screen.getByTestId('alertMessage')).toBeInTheDocument();
       expect(screen.getByText(`${ERROR_MESSAGES.invalidDuration}`)).toBeInTheDocument();
     });
+
     test('hours and minutes should be validated indepedently', async () => {
       const { user } = setup(<FormPage />, { withUser: true });
 
@@ -87,6 +90,7 @@ describe('testing form validation and submission', () => {
       expect(screen.getByTestId('alertMessage')).toBeInTheDocument();
       expect(screen.getByText(`${ERROR_MESSAGES.invalidDuration}`)).toBeInTheDocument();
     });
+
     test('alert should disappear when user clears invalid input', async () => {
       const { user } = setup(<FormPage />, { withUser: true });
       const textbox = screen.getByLabelText('hour(s)');
@@ -108,6 +112,7 @@ describe('testing form validation and submission', () => {
       expect(screen.getByTestId('alertMessage')).toBeInTheDocument();
       expect(screen.getByText(`${ERROR_MESSAGES.missingDuration}`)).toBeInTheDocument();
     });
+
     test('alert should display if input fields only contain 0', async () => {
       const { user } = setup(<FormPage />, { withUser: true });
 
@@ -122,6 +127,7 @@ describe('testing form validation and submission', () => {
       expect(screen.getByTestId('alertMessage')).toBeInTheDocument();
       expect(screen.getByText(`${ERROR_MESSAGES.missingDuration}`)).toBeInTheDocument();
     });
+
     test('both input error alerts should display in case of invalid input', async () => {
       const { user } = setup(<FormPage />, { withUser: true });
 
@@ -132,6 +138,7 @@ describe('testing form validation and submission', () => {
       expect(screen.getByText(`${ERROR_MESSAGES.invalidDuration}`)).toBeInTheDocument();
       expect(screen.getByText(`${ERROR_MESSAGES.missingDuration}`)).toBeInTheDocument();
     });
+
     test('alert should not display for valid inputs', async () => {
       const { user } = setup(<FormPage />, { withUser: true });
 
@@ -153,6 +160,7 @@ describe('testing form validation and submission', () => {
       expect(screen.getByTestId('alertMessage')).toBeInTheDocument();
       expect(screen.getByText(`${ERROR_MESSAGES.missingGenre}`)).toBeInTheDocument();
     });
+
     test('alert should not display if a genre is selected', async () => {
       const { user } = setup(<FormPage />, { withUser: true });
 
@@ -161,6 +169,7 @@ describe('testing form validation and submission', () => {
       expect(screen.queryByText(`${ERROR_MESSAGES.missingGenre}`)).toBe(null);
     });
   });
+
   test('submission handler should not make api request if any required input is missing or invalid', async () => {
     const { user } = setup(<FormPage />, { withUser: true });
     const generatePlaylist = jest.spyOn(playlistService, 'default');
@@ -177,6 +186,7 @@ describe('testing form validation and submission', () => {
     await user?.click(screen.getByText(/generate my playlist/i));
     expect(generatePlaylist).not.toHaveBeenCalled();
   });
+
   test('if input is valid, submission should make api call', async () => {
     const { user } = setup(<FormPage />, { withUser: true });
     const generatePlaylist = jest.spyOn(playlistService, 'default');
@@ -197,6 +207,33 @@ describe('testing form validation and submission', () => {
         genres: expect.any(String),
       })
     );
-    // expect(window.location.pathname).toBe('/player');
+  });
+});
+
+describe('testing form redirect after submission', () => {
+  test('form should redirect to player upon request success', async () => {
+    const { user } = setup(<FormPage />, { withUser: true });
+    const generatePlaylist = jest.spyOn(playlistService, 'default');
+    generatePlaylist.mockResolvedValue('test-playlist-id');
+
+    await user?.type(screen.getByLabelText('minutes'), '10');
+    await user?.selectOptions(screen.getByLabelText('genres'), SPOTIFY_GENRE_SEEDS[0]);
+    await user?.click(screen.getByText(/generate my playlist/i));
+    expect(screen.queryByTestId('alertMessage')).toBe(null);
+    expect(generatePlaylist).toHaveBeenCalled();
+    expect(window.location.pathname).toBe('/player');
+  });
+
+  test('form should redirect to error page upon request failure', async () => {
+    const { user } = setup(<FormPage />, { withUser: true });
+    const generatePlaylist = jest.spyOn(playlistService, 'default');
+    generatePlaylist.mockResolvedValue(new Error('test-server-error'));
+
+    await user?.type(screen.getByLabelText('minutes'), '10');
+    await user?.selectOptions(screen.getByLabelText('genres'), SPOTIFY_GENRE_SEEDS[0]);
+    await user?.click(screen.getByText(/generate my playlist/i));
+    expect(screen.queryByTestId('alertMessage')).toBe(null);
+    expect(generatePlaylist).toHaveBeenCalled();
+    expect(window.location.pathname).toBe('/error');
   });
 });
