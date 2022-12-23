@@ -127,6 +127,11 @@ export const SPOTIFY_GENRE_SEEDS: string[] = [
   'world-music',
 ];
 
+export const ENDPOINTS: Record<string, string> = {
+  oauth: 'http://localhost:8080/api/login',
+  playlist: '/api/generatePlaylist',
+};
+
 export const ERROR_MESSAGES: Record<string, string> = {
   invalidDuration: 'Please enter numbers for playlist length',
   missingDuration: 'Please specify at least one valid value for playlist length',

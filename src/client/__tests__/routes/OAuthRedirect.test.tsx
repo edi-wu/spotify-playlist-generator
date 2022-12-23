@@ -6,6 +6,7 @@ import React from 'react';
 import '@testing-library/jest-dom';
 import setup from '../../utils/testSetup';
 import OAuthRedirect from '../../routes/OAuthRedirect';
+import { ENDPOINTS } from '../../constants';
 
 describe('oauth component rendering and navigation', () => {
   test('page should not render any content', () => {
@@ -23,6 +24,6 @@ describe('oauth component rendering and navigation', () => {
     });
     setup(<OAuthRedirect />);
     expect(mockReplace).toHaveBeenCalled();
-    expect(mockReplace).toHaveBeenCalledWith('http://localhost:8080/api/login');
+    expect(mockReplace).toHaveBeenCalledWith(`${ENDPOINTS.oauth}`);
   });
 });

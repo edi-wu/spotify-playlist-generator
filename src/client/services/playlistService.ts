@@ -1,8 +1,9 @@
 import axios from 'axios';
+import { ENDPOINTS } from '../constants';
 import { FormData } from '../types';
 
 const generatePlaylist = async (input: FormData): Promise<string | Error> => {
-  const url: string = '/api/generatePlaylist';
+  const url: string = `${ENDPOINTS.playlist}`;
   console.log('incoming data:', input);
   try {
     const { data } = await axios.post<string>(url, input);
