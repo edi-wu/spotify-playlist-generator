@@ -6,7 +6,7 @@ import TextInput from '../components/TextInput';
 import DropDownMenu from '../components/DropDownMenu';
 import Alert from '../components/Alert';
 import isPositiveIntegerString from '../utils/inputValidation';
-import generatePlaylist from '../services/playlist';
+import generatePlaylist from '../services/playlistService';
 import { FormData } from '../types';
 import { SPOTIFY_GENRE_SEEDS, ERROR_MESSAGES } from '../constants';
 
@@ -58,7 +58,7 @@ const FormPage = () => {
     setFormData({ ...formData, [sourceName]: sourceValue });
   };
 
-  const handleSubmit: MouseEventHandler<HTMLButtonElement> = (event) => {
+  const handleSubmit: MouseEventHandler<HTMLButtonElement> = async (event) => {
     event.preventDefault();
     let validationPassed = true;
     setHasClicked(true);
@@ -80,9 +80,13 @@ const FormPage = () => {
     if (!validationPassed) {
       return;
     }
-    // expect playlist id string to come back; if error, cb can return error string instead for handling
-    const playlistId = generatePlaylist(formData);
-    navigate('/player', { state: { playlistId } });
+    const serverResponse: string | Error = await generatePlaylist(formData);
+    if (serverResponse instanceof Error) {
+      // go to some error page here...
+      console.log('returned error: ', serverResponse);
+      return;
+    }
+    navigate('/player', { state: { playlistId: serverResponse } });
   };
 
   return (
