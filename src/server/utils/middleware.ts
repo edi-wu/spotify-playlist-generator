@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-// eslint-disable-next-line object-curly-newline
 import { RequestHandler, ErrorRequestHandler } from 'express';
 import { CookiesObj, ServerError } from '../types';
 

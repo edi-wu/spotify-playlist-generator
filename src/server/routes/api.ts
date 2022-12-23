@@ -1,5 +1,6 @@
 import express, { Router } from 'express';
 import oauthController from '../controllers/oauthController';
+import playlistController from '../controllers/playlistController';
 import { setCookies } from '../utils/middleware';
 
 const apiRouter: Router = express.Router();
@@ -15,5 +16,8 @@ apiRouter.get(
   setCookies,
   oauthController.redirect
 );
+
+// Route to generate playlist and return playlist ID
+apiRouter.post('/generatePlaylist', playlistController.placeholder);
 
 export default apiRouter;

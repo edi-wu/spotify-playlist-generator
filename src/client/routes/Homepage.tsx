@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { MouseEventHandler } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import Button from '../components/Button';
@@ -17,7 +17,7 @@ const LoginButton = styled(Button)`
 
 const Homepage = () => {
   const navigate = useNavigate();
-  const goToOAuth = (): void => {
+  const goToOAuth: MouseEventHandler<HTMLButtonElement> = (): void => {
     navigate('/oauth');
   };
   return (

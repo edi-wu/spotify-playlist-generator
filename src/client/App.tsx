@@ -4,9 +4,10 @@ import Homepage from './routes/Homepage';
 import OAuthRedirect from './routes/OAuthRedirect';
 import FormPage from './routes/FormPage';
 import WebPlayerPage from './routes/WebPlayerPage';
+import ErrorPage from './routes/ErrorPage';
 import { RoutesConfig } from './types';
 
-// TODO: add errorElement route to handle thrown errors
+// TODO: flesh out errorElement route to handle thrown errors
 export const routesConfig: RoutesConfig = [
   {
     path: '/',
@@ -15,6 +16,7 @@ export const routesConfig: RoutesConfig = [
   { path: '/oauth', element: <OAuthRedirect /> },
   { path: '/form', element: <FormPage /> },
   { path: '/player', element: <WebPlayerPage /> },
+  { path: '/error', element: <ErrorPage /> },
 ];
 
 const router = createHashRouter(routesConfig);

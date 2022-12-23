@@ -17,10 +17,7 @@
   "plugins": ["react", "@typescript-eslint"],
   "ignorePatterns": ["webpack.config.js", "jest.config.js"],
   "rules": {
-    "react/jsx-filename-extension": [
-      "error",
-      { "extensions": [".jsx", ".tsx"] }
-    ],
+    "react/jsx-filename-extension": ["error", { "extensions": [".jsx", ".tsx"] }],
     "react/function-component-definition": [
       2,
       {
@@ -29,7 +26,9 @@
     ],
     "no-console": "off",
     "comma-dangle": "off",
-    "@typescript-eslint/comma-dangle": "off"
+    "@typescript-eslint/comma-dangle": "off",
+    "object-curly-newline": "off",
+    "operator-linebreak": "off"
   },
   "settings": {
     "import/resolver": {

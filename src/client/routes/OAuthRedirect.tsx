@@ -1,5 +1,7 @@
+import { ENDPOINTS } from '../constants';
+
 const OAuthRedirect = () => {
-  window.location.replace('http://localhost:8080/api/login');
+  window.location.replace(`${ENDPOINTS.oauth}`);
   return null;
 };
 
