@@ -2,6 +2,7 @@ import httpMocks from 'node-mocks-http';
 import oauthController from '../../controllers/oauthController';
 import generateRandomString from '../../utils/helpers';
 import spotifyApi from '../../utils/apiWrapper';
+import ERROR_MESSAGES from '../../constants';
 
 const response = httpMocks.createResponse();
 const next = jest.fn();
@@ -32,9 +33,9 @@ describe('testing middleware that generates Spotify OAuth redirect URL', () => {
     oauthController.generateRedirectUrl(request, response, next);
     expect(next).toHaveBeenCalledWith(
       expect.objectContaining({
-        log: expect.any(String),
+        log: `${ERROR_MESSAGES.noClientId.log}`,
         status: 500,
-        message: expect.objectContaining({ err: expect.any(String) }),
+        message: expect.objectContaining({ err: `${ERROR_MESSAGES.noClientId.response}` }),
       })
     );
   });
@@ -71,9 +72,9 @@ describe('testing middleware that validates OAuth response', () => {
     oauthController.validateOAuth(request, response, next);
     expect(next).toHaveBeenCalledWith(
       expect.objectContaining({
-        log: expect.any(String),
+        log: `${ERROR_MESSAGES.invalidState.log}`,
         status: 500,
-        message: expect.objectContaining({ err: expect.any(String) }),
+        message: expect.objectContaining({ err: `${ERROR_MESSAGES.invalidState.response}` }),
       })
     );
   });
@@ -87,9 +88,9 @@ describe('testing middleware that validates OAuth response', () => {
     oauthController.validateOAuth(request, response, next);
     expect(next).toHaveBeenCalledWith(
       expect.objectContaining({
-        log: expect.any(String),
+        log: `${ERROR_MESSAGES.invalidState.log}`,
         status: 500,
-        message: expect.objectContaining({ err: expect.any(String) }),
+        message: expect.objectContaining({ err: `${ERROR_MESSAGES.invalidState.response}` }),
       })
     );
   });
@@ -99,9 +100,9 @@ describe('testing middleware that validates OAuth response', () => {
     oauthController.validateOAuth(request, response, next);
     expect(next).toHaveBeenCalledWith(
       expect.objectContaining({
-        log: expect.any(String),
+        log: `${ERROR_MESSAGES.authFailed.log}`,
         status: 500,
-        message: expect.objectContaining({ err: expect.any(String) }),
+        message: expect.objectContaining({ err: `${ERROR_MESSAGES.authFailed.response}` }),
       })
     );
   });
@@ -111,9 +112,9 @@ describe('testing middleware that validates OAuth response', () => {
     oauthController.validateOAuth(request, response, next);
     expect(next).toHaveBeenCalledWith(
       expect.objectContaining({
-        log: expect.any(String),
+        log: `${ERROR_MESSAGES.authFailed.log}`,
         status: 500,
-        message: expect.objectContaining({ err: expect.any(String) }),
+        message: expect.objectContaining({ err: `${ERROR_MESSAGES.authFailed.response}` }),
       })
     );
   });
@@ -141,9 +142,9 @@ describe('testing middleware that obtains access token', () => {
     await oauthController.generateToken(request, response, next);
     expect(next).toHaveBeenCalledWith(
       expect.objectContaining({
-        log: expect.any(String),
+        log: `${ERROR_MESSAGES.tokenError.log}`,
         status: 500,
-        message: expect.objectContaining({ err: expect.any(String) }),
+        message: expect.objectContaining({ err: `${ERROR_MESSAGES.tokenError.response}` }),
       })
     );
   });

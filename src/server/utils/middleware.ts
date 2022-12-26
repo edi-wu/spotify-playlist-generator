@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { RequestHandler, ErrorRequestHandler } from 'express';
 import { CookiesObj, ServerError } from '../types';
+import ERROR_MESSAGES from '../constants';
 
 export const setCookies: RequestHandler = (req, res, next) => {
   const cookiesObj: CookiesObj = res.locals.cookies;
@@ -10,18 +11,18 @@ export const setCookies: RequestHandler = (req, res, next) => {
 
 export const unknownEndpointHandler: RequestHandler = (req, res, next) => {
   const endpointError: ServerError = {
-    log: 'Request was made to an unavailable endpoint.',
+    log: `${ERROR_MESSAGES.noEndpoint.log}`,
     status: 404,
-    message: { err: 'An error has occurred: endpoint not found.' },
+    message: { err: `${ERROR_MESSAGES.noEndpoint.response}` },
   };
   return next(endpointError);
 };
 
 export const globalErrorHandler: ErrorRequestHandler = (err, req, res, next) => {
   const defaultErr: ServerError = {
-    log: 'Express error handler caught unknown middleware error.',
+    log: `${ERROR_MESSAGES.defaultError.log}`,
     status: 500,
-    message: { err: 'An error has occurred.' },
+    message: { err: `${ERROR_MESSAGES.defaultError.response}` },
   };
   const errorObj: ServerError = { ...defaultErr, ...err };
   console.log(errorObj.log);

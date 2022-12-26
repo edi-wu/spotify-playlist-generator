@@ -18,4 +18,5 @@ export type ServerError = {
   message: {
     err: string;
   };
+  errorResponse?: unknown;
 };
