@@ -1,4 +1,5 @@
-import { generateRandomString, isApiErrorResponse } from '../utils/helpers';
+import { generateRandomString, getErrorDetails } from '../utils/helpers';
+import ERROR_MESSAGES from '../constants';
 
 describe('testing random string generator', () => {
   test('function should return string of specified length', () => {
@@ -16,21 +17,20 @@ describe('testing random string generator', () => {
   });
 });
 
-describe('testing type guard for API response error', () => {
-  test('function should return true for API response error object', () => {
-    const err = {
-      statusCode: 500,
-      body: { error: { status: 500, message: 'error' } },
-      headers: { test: 'test' },
-    };
-    expect(isApiErrorResponse(err)).toBe(true);
+describe('testing function to extract error status and log', () => {
+  test('function should return default status and log if input does not pass type guard', () => {
+    const err1 = { statusCode: 500, message: 'error' };
+    expect(getErrorDetails(err1)).toEqual([ERROR_MESSAGES.defaultError.log, 500]);
+    const err2 = { body: { error: { status: 500, message: 'error' } } };
+    expect(getErrorDetails(err2)).toEqual([ERROR_MESSAGES.defaultError.log, 500]);
   });
 
-  test('function should return false for other (error) objects', () => {
-    const otherOne = { statusCode: 500, message: 'error' };
-    expect(isApiErrorResponse(otherOne)).toBe(false);
-
-    const otherTwo = { body: { error: { status: 500, message: 'error' } } };
-    expect(isApiErrorResponse(otherTwo)).toBe(false);
+  test('function should extract status and log from valid error object', () => {
+    const err = {
+      statusCode: 417,
+      body: { error: { status: 417, message: 'api error response' } },
+      headers: { test: 'test' },
+    };
+    expect(getErrorDetails(err)).toEqual(['api error response', 417]);
   });
 });

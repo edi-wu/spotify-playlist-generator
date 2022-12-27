@@ -1,4 +1,5 @@
 import { ApiErrorResponse } from '../types';
+import ERROR_MESSAGES from '../constants';
 
 export const generateRandomString = (length: number): string => {
   // eslint-disable-next-line operator-linebreak
@@ -12,7 +13,17 @@ export const generateRandomString = (length: number): string => {
   return result;
 };
 
-export const isApiErrorResponse = (error: unknown): error is ApiErrorResponse =>
+const isApiErrorResponse = (error: unknown): error is ApiErrorResponse =>
   // eslint-disable-next-line implicit-arrow-linebreak
   (error as ApiErrorResponse).statusCode !== undefined &&
   (error as ApiErrorResponse).body?.error?.message !== undefined;
+
+export const getErrorDetails = (error: unknown): [string, number] => {
+  let errorLog: string = `${ERROR_MESSAGES.defaultError.log}`;
+  let errorStatus: number = 500;
+  if (isApiErrorResponse(error)) {
+    errorLog = error.body.error.message;
+    errorStatus = error.statusCode;
+  }
+  return [errorLog, errorStatus];
+};

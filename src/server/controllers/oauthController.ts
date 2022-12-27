@@ -1,6 +1,6 @@
 import querystring from 'querystring';
 import spotifyApi from '../utils/apiWrapper';
-import { generateRandomString, isApiErrorResponse } from '../utils/helpers';
+import { generateRandomString, getErrorDetails } from '../utils/helpers';
 import { Controller, CookiesObj, OAuthQueryParams, ServerError } from '../types';
 import ERROR_MESSAGES from '../constants';
 
@@ -74,12 +74,7 @@ oauthController.generateToken = async (req, res, next) => {
     res.locals.redirectUrl = '/#/form';
     return next();
   } catch (err) {
-    let errorStatus: number = 500;
-    let errorLog: string = `${ERROR_MESSAGES.tokenError.log}`;
-    if (isApiErrorResponse(err)) {
-      errorStatus = err.statusCode;
-      errorLog = err.body.error.message;
-    }
+    const [errorLog, errorStatus] = getErrorDetails(err);
     const tokenGenerationError: ServerError = {
       log: errorLog,
       status: errorStatus,
