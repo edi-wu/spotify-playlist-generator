@@ -19,3 +19,14 @@ export type ServerError = {
     err: string;
   };
 };
+
+export type ApiErrorResponse = {
+  body: {
+    error: {
+      status: number;
+      message: string;
+    };
+  };
+  statusCode: number;
+  headers: Record<string, string>;
+};

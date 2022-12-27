@@ -1,7 +1,8 @@
 import querystring from 'querystring';
-import { Controller, CookiesObj, OAuthQueryParams, ServerError } from '../types';
-import generateRandomString from '../utils/helpers';
 import spotifyApi from '../utils/apiWrapper';
+import { generateRandomString, getErrorDetails } from '../utils/helpers';
+import { Controller, CookiesObj, OAuthQueryParams, ServerError } from '../types';
+import { ERROR_MESSAGES } from '../constants';
 
 const oauthController: Controller = {};
 
@@ -9,10 +10,10 @@ oauthController.generateRedirectUrl = (req, res, next) => {
   const clientId: string | undefined = process.env.CLIENT_ID;
   if (clientId === undefined || clientId.length === 0) {
     const noClientIdError: ServerError = {
-      log: 'Missing Spotify client ID in .env.',
+      log: `${ERROR_MESSAGES.noClientId.log}`,
       status: 500,
       message: {
-        err: 'An error has occurred: application is missing valid Spotify client ID.',
+        err: `${ERROR_MESSAGES.noClientId.response}`,
       },
     };
     return next(noClientIdError);
@@ -43,19 +44,19 @@ oauthController.validateOAuth = (req, res, next) => {
   const sentState: string = req.cookies.state;
   if (error || !code) {
     const authorizationError: ServerError = {
-      log: `Spotify authorization failed. Error: ${error}`,
+      log: `${ERROR_MESSAGES.authFailed.log}`,
       status: 500,
       message: {
-        err: 'An error has occurred: Spotify access denied.',
+        err: `${ERROR_MESSAGES.authFailed.response}`,
       },
     };
     return next(authorizationError);
   }
   if (sentState !== state) {
     const stateValidationError: ServerError = {
-      log: 'State validation failed.',
+      log: `${ERROR_MESSAGES.invalidState.log}`,
       status: 500,
-      message: { err: 'An error has occurred: unable to confirm Spotify as response origin.' },
+      message: { err: `${ERROR_MESSAGES.invalidState.response}` },
     };
     return next(stateValidationError);
   }
@@ -73,11 +74,12 @@ oauthController.generateToken = async (req, res, next) => {
     res.locals.redirectUrl = '/#/form';
     return next();
   } catch (err) {
+    const [errorLog, errorStatus] = getErrorDetails(err);
     const tokenGenerationError: ServerError = {
-      log: `Token generation failed. Error: ${err}`,
-      status: 500,
+      log: errorLog,
+      status: errorStatus,
       message: {
-        err: 'An error has occurred: unable to obtain access token from Spotify.',
+        err: `${ERROR_MESSAGES.tokenError.response}`,
       },
     };
     return next(tokenGenerationError);

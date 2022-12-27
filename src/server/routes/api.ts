@@ -18,6 +18,12 @@ apiRouter.get(
 );
 
 // Route to generate playlist and return playlist ID
-apiRouter.post('/generatePlaylist', playlistController.placeholder);
+apiRouter.post(
+  '/generatePlaylist',
+  playlistController.createPlaylist,
+  playlistController.getRecommendations,
+  playlistController.addTracks,
+  playlistController.returnPlaylist
+);
 
 export default apiRouter;

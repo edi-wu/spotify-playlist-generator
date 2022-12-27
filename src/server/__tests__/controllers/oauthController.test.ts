@@ -1,7 +1,8 @@
 import httpMocks from 'node-mocks-http';
 import oauthController from '../../controllers/oauthController';
-import generateRandomString from '../../utils/helpers';
+import { generateRandomString } from '../../utils/helpers';
 import spotifyApi from '../../utils/apiWrapper';
+import { ERROR_MESSAGES } from '../../constants';
 
 const response = httpMocks.createResponse();
 const next = jest.fn();
@@ -11,7 +12,11 @@ beforeEach(() => {
   response.locals = {};
 });
 
-describe('testing middleware that generates Spotify OAuth redirect URL', () => {
+afterEach(() => {
+  jest.clearAllMocks();
+});
+
+describe('testing Spotify OAuth redirect URL generation middleware', () => {
   const OLD_ENV = process.env;
   const request = httpMocks.createRequest({
     method: 'GET',
@@ -32,9 +37,9 @@ describe('testing middleware that generates Spotify OAuth redirect URL', () => {
     oauthController.generateRedirectUrl(request, response, next);
     expect(next).toHaveBeenCalledWith(
       expect.objectContaining({
-        log: expect.any(String),
+        log: `${ERROR_MESSAGES.noClientId.log}`,
         status: 500,
-        message: expect.objectContaining({ err: expect.any(String) }),
+        message: expect.objectContaining({ err: `${ERROR_MESSAGES.noClientId.response}` }),
       })
     );
   });
@@ -58,7 +63,7 @@ describe('testing middleware that generates Spotify OAuth redirect URL', () => {
   });
 });
 
-describe('testing middleware that validates OAuth response', () => {
+describe('testing OAuth response validation middleware', () => {
   const state: string = generateRandomString(16);
   const request = httpMocks.createRequest({
     method: 'GET',
@@ -71,9 +76,9 @@ describe('testing middleware that validates OAuth response', () => {
     oauthController.validateOAuth(request, response, next);
     expect(next).toHaveBeenCalledWith(
       expect.objectContaining({
-        log: expect.any(String),
+        log: `${ERROR_MESSAGES.invalidState.log}`,
         status: 500,
-        message: expect.objectContaining({ err: expect.any(String) }),
+        message: expect.objectContaining({ err: `${ERROR_MESSAGES.invalidState.response}` }),
       })
     );
   });
@@ -87,9 +92,9 @@ describe('testing middleware that validates OAuth response', () => {
     oauthController.validateOAuth(request, response, next);
     expect(next).toHaveBeenCalledWith(
       expect.objectContaining({
-        log: expect.any(String),
+        log: `${ERROR_MESSAGES.invalidState.log}`,
         status: 500,
-        message: expect.objectContaining({ err: expect.any(String) }),
+        message: expect.objectContaining({ err: `${ERROR_MESSAGES.invalidState.response}` }),
       })
     );
   });
@@ -99,9 +104,9 @@ describe('testing middleware that validates OAuth response', () => {
     oauthController.validateOAuth(request, response, next);
     expect(next).toHaveBeenCalledWith(
       expect.objectContaining({
-        log: expect.any(String),
+        log: `${ERROR_MESSAGES.authFailed.log}`,
         status: 500,
-        message: expect.objectContaining({ err: expect.any(String) }),
+        message: expect.objectContaining({ err: `${ERROR_MESSAGES.authFailed.response}` }),
       })
     );
   });
@@ -111,9 +116,9 @@ describe('testing middleware that validates OAuth response', () => {
     oauthController.validateOAuth(request, response, next);
     expect(next).toHaveBeenCalledWith(
       expect.objectContaining({
-        log: expect.any(String),
+        log: `${ERROR_MESSAGES.authFailed.log}`,
         status: 500,
-        message: expect.objectContaining({ err: expect.any(String) }),
+        message: expect.objectContaining({ err: `${ERROR_MESSAGES.authFailed.response}` }),
       })
     );
   });
@@ -137,13 +142,13 @@ describe('testing middleware that obtains access token', () => {
   });
 
   test('middleware should throw error if Spotify API returns error', async () => {
-    spotifyApi.authorizationCodeGrant = jest.fn().mockReturnValueOnce(new Error('test error'));
+    spotifyApi.authorizationCodeGrant = jest.fn().mockReturnValueOnce(new Error());
     await oauthController.generateToken(request, response, next);
     expect(next).toHaveBeenCalledWith(
       expect.objectContaining({
-        log: expect.any(String),
+        log: `${ERROR_MESSAGES.defaultError.log}`,
         status: 500,
-        message: expect.objectContaining({ err: expect.any(String) }),
+        message: expect.objectContaining({ err: `${ERROR_MESSAGES.tokenError.response}` }),
       })
     );
   });
@@ -167,7 +172,7 @@ describe('testing middleware that obtains access token', () => {
   });
 });
 
-describe('testing middleware that redirects request', () => {
+describe('testing redirect middleware', () => {
   const request = httpMocks.createRequest({
     method: 'GET',
     url: '/any-route',
