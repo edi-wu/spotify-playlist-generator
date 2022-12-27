@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { RequestHandler, ErrorRequestHandler } from 'express';
 import { CookiesObj, ServerError } from '../types';
-import ERROR_MESSAGES from '../constants';
+import { ERROR_MESSAGES } from '../constants';
 
 export const setCookies: RequestHandler = (req, res, next) => {
   const cookiesObj: CookiesObj = res.locals.cookies;

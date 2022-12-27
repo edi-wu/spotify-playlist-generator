@@ -3,7 +3,7 @@ import {
   getErrorDetails,
   convertInputToMilliseconds,
 } from '../utils/helpers';
-import ERROR_MESSAGES from '../constants';
+import { ERROR_MESSAGES } from '../constants';
 
 describe('testing random string generator', () => {
   test('function should return string of specified length', () => {

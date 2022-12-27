@@ -1,4 +1,4 @@
-const ERROR_MESSAGES: Record<string, { log?: string; response?: string }> = {
+export const ERROR_MESSAGES: Record<string, { log?: string; response?: string }> = {
   noEndpoint: {
     log: 'Request was made to an unavailable endpoint.',
     response: 'An error has occurred: endpoint not found.',
@@ -34,4 +34,6 @@ const ERROR_MESSAGES: Record<string, { log?: string; response?: string }> = {
   },
 };
 
-export default ERROR_MESSAGES;
+export const MAX_TRACK_LENGTH: number = 900000;
+
+export const ONE_MIN_IN_MS: number = 60000;

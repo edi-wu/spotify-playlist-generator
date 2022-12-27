@@ -1,5 +1,5 @@
 import { ApiErrorResponse } from '../types';
-import ERROR_MESSAGES from '../constants';
+import { ERROR_MESSAGES } from '../constants';
 
 export const generateRandomString = (length: number): string => {
   // eslint-disable-next-line operator-linebreak

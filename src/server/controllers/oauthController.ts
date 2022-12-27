@@ -2,7 +2,7 @@ import querystring from 'querystring';
 import spotifyApi from '../utils/apiWrapper';
 import { generateRandomString, getErrorDetails } from '../utils/helpers';
 import { Controller, CookiesObj, OAuthQueryParams, ServerError } from '../types';
-import ERROR_MESSAGES from '../constants';
+import { ERROR_MESSAGES } from '../constants';
 
 const oauthController: Controller = {};
 

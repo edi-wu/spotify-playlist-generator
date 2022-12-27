@@ -2,7 +2,7 @@ import httpMocks from 'node-mocks-http';
 import oauthController from '../../controllers/oauthController';
 import { generateRandomString } from '../../utils/helpers';
 import spotifyApi from '../../utils/apiWrapper';
-import ERROR_MESSAGES from '../../constants';
+import { ERROR_MESSAGES } from '../../constants';
 
 const response = httpMocks.createResponse();
 const next = jest.fn();
