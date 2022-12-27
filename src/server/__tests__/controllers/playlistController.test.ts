@@ -43,13 +43,13 @@ describe('testing playlist creation middleware', () => {
   test('middleware should throw error if API responds with error', async () => {
     spotifyApi.createPlaylist = jest.fn().mockRejectedValueOnce({
       statusCode: 417,
-      body: { error: { status: 417, message: 'api error response' } },
+      body: { error: { status: 417, message: 'unable to create playlist' } },
       headers: { test: 'test' },
     });
     await playlistController.createPlaylist(request, response, next);
     expect(next).toHaveBeenCalledWith(
       expect.objectContaining({
-        log: 'api error response',
+        log: 'unable to create playlist',
         status: 417,
         message: expect.objectContaining({
           err: `${ERROR_MESSAGES.playlistCreationFailed.response}`,
@@ -151,16 +151,62 @@ describe('testing middleware to get recommended tracks', () => {
   test('middleware should throw error if API responds with error', async () => {
     spotifyApi.getRecommendations = jest.fn().mockRejectedValueOnce({
       statusCode: 417,
-      body: { error: { status: 417, message: 'api error response' } },
+      body: { error: { status: 417, message: 'unable to get recommendations' } },
       headers: { test: 'test' },
     });
     await playlistController.getRecommendations(request, response, next);
     expect(next).toHaveBeenCalledWith(
       expect.objectContaining({
-        log: 'api error response',
+        log: 'unable to get recommendations',
         status: 417,
         message: expect.objectContaining({
           err: `${ERROR_MESSAGES.trackGenerationFailed.response}`,
+        }),
+      })
+    );
+  });
+});
+
+describe('testing middleware to add tracks onto playlist', () => {
+  const request = httpMocks.createRequest({
+    method: 'POST',
+    url: '/generatePlaylist',
+    cookies: { access: mockAccessToken, refresh: mockRefreshToken },
+    body: {
+      title: 'my playlist',
+      description: 'playlist description',
+      durationHours: '',
+      durationMinutes: '5',
+      genres: 'classical',
+    },
+  });
+  response.locals.playlistId = generateRandomString(16);
+  response.locals.tracks = [generateRandomString(8), generateRandomString(8)];
+
+  test('middleware should add tracks onto provided playlist', async () => {
+    spotifyApi.addTracksToPlaylist = jest.fn();
+    await playlistController.addTracks(request, response, next);
+    expect(spotifyApi.addTracksToPlaylist).toHaveBeenNthCalledWith(
+      1,
+      response.locals.playlistId,
+      response.locals.tracks
+    );
+    expect(next).toHaveBeenCalled();
+  });
+
+  test('middleware should throw error if API responds with error', async () => {
+    spotifyApi.addTracksToPlaylist = jest.fn().mockRejectedValueOnce({
+      statusCode: 417,
+      body: { error: { status: 417, message: 'unable to add tracks' } },
+      headers: { test: 'test' },
+    });
+    await playlistController.addTracks(request, response, next);
+    expect(next).toHaveBeenCalledWith(
+      expect.objectContaining({
+        log: 'unable to add tracks',
+        status: 417,
+        message: expect.objectContaining({
+          err: `${ERROR_MESSAGES.trackAdditionFailed.response}`,
         }),
       })
     );
