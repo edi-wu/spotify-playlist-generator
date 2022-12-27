@@ -20,7 +20,6 @@ export const ERROR_MESSAGES: Record<string, { log?: string; response?: string }>
     response: 'An error has occurred: unable to confirm Spotify as response origin.',
   },
   tokenError: {
-    log: 'Token generation failed.',
     response: 'An error has occurred: unable to obtain access token from Spotify.',
   },
   playlistCreationFailed: {

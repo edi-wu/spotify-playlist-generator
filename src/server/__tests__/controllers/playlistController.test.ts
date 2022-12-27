@@ -212,3 +212,27 @@ describe('testing middleware to add tracks onto playlist', () => {
     );
   });
 });
+
+describe('testing middleware to return playlistId as response', () => {
+  const request = httpMocks.createRequest({
+    method: 'POST',
+    url: '/generatePlaylist',
+    cookies: { access: mockAccessToken, refresh: mockRefreshToken },
+    body: {
+      title: 'my playlist',
+      description: 'playlist description',
+      durationHours: '',
+      durationMinutes: '5',
+      genres: 'classical',
+    },
+  });
+
+  test('middleware should return playlist ID as response', () => {
+    const mockPlaylistId = generateRandomString(16);
+    response.locals.playlistId = mockPlaylistId;
+    response.json = jest.fn();
+    playlistController.returnPlaylist(request, response, next);
+    expect(response.statusCode).toBe(200);
+    expect(response.json).toHaveBeenCalledWith(mockPlaylistId);
+  });
+});

@@ -146,7 +146,7 @@ describe('testing middleware that obtains access token', () => {
     await oauthController.generateToken(request, response, next);
     expect(next).toHaveBeenCalledWith(
       expect.objectContaining({
-        log: `${ERROR_MESSAGES.tokenError.log}`,
+        log: `${ERROR_MESSAGES.defaultError.log}`,
         status: 500,
         message: expect.objectContaining({ err: `${ERROR_MESSAGES.tokenError.response}` }),
       })
