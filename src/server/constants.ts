@@ -27,6 +27,7 @@ export const ERROR_MESSAGES: Record<string, { log?: string; response?: string }>
     response: 'Failed to create a new playlist.',
   },
   trackGenerationFailed: {
+    log: 'API returned no tracks matching request criteria.',
     response: 'Failed to get tracks based on user preferences.',
   },
   trackAdditionFailed: {

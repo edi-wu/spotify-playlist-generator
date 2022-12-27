@@ -130,6 +130,24 @@ describe('testing middleware to get recommended tracks', () => {
     expect(next).toHaveBeenCalled();
   });
 
+  test('middleware should throw error if API returns no tracks', async () => {
+    spotifyApi.getRecommendations = jest.fn().mockImplementation(() => ({
+      body: {
+        tracks: [],
+      },
+    }));
+    await playlistController.getRecommendations(request, response, next);
+    expect(next).toHaveBeenCalledWith(
+      expect.objectContaining({
+        log: `${ERROR_MESSAGES.trackGenerationFailed.log}`,
+        status: 400,
+        message: expect.objectContaining({
+          err: `${ERROR_MESSAGES.trackGenerationFailed.response}`,
+        }),
+      })
+    );
+  });
+
   test('middleware should throw error if API responds with error', async () => {
     spotifyApi.getRecommendations = jest.fn().mockRejectedValueOnce({
       statusCode: 417,

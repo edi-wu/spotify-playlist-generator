@@ -45,7 +45,16 @@ playlistController.getRecommendations = async (req, res, next) => {
       // cannot use promise.all since each track length is unknown until response is received
       // eslint-disable-next-line no-await-in-loop
       const response = await spotifyApi.getRecommendations(options);
-      const { duration_ms, uri } = response.body.tracks[0];
+      const track = response.body.tracks[0];
+      if (!track) {
+        const noTracksReturnedError: ServerError = {
+          log: `${ERROR_MESSAGES.trackGenerationFailed.log}`,
+          status: 400,
+          message: { err: `${ERROR_MESSAGES.trackGenerationFailed.response}` },
+        };
+        return next(noTracksReturnedError);
+      }
+      const { duration_ms, uri } = track;
       timeLeft -= duration_ms;
       trackList.push(uri);
     }
@@ -62,7 +71,20 @@ playlistController.getRecommendations = async (req, res, next) => {
   }
 };
 
-playlistController.addTracks = async (req, res, next) => next();
+playlistController.addTracks = async (req, res, next) => {
+  try {
+    await spotifyApi.addTracksToPlaylist(res.locals.playlistId, res.locals.trackList);
+    return next();
+  } catch (err: unknown) {
+    const [errorLog, errorStatus] = getErrorDetails(err);
+    const trackAdditionError: ServerError = {
+      log: errorLog,
+      status: errorStatus,
+      message: { err: `${ERROR_MESSAGES.trackAdditionFailed.response}` },
+    };
+    return next(trackAdditionError);
+  }
+};
 
 playlistController.returnPlaylist = (req, res) => {
   res.status(200).json(res.locals.playlistId);
