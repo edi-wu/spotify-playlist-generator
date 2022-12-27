@@ -1,4 +1,8 @@
-import { generateRandomString, getErrorDetails } from '../utils/helpers';
+import {
+  generateRandomString,
+  getErrorDetails,
+  convertInputToMilliseconds,
+} from '../utils/helpers';
 import ERROR_MESSAGES from '../constants';
 
 describe('testing random string generator', () => {
@@ -32,5 +36,24 @@ describe('testing function to extract error status and log', () => {
       headers: { test: 'test' },
     };
     expect(getErrorDetails(err)).toEqual(['api error response', 417]);
+  });
+});
+
+describe('testing function to convert input to milliseconds', () => {
+  const hours = '1';
+  const minutes = '10';
+  const noInput = '';
+
+  test('function should return correct value in ms when provided at least one input', () => {
+    const bothInputsResult = convertInputToMilliseconds(hours, minutes);
+    expect(bothInputsResult).toBe(4200000);
+    const onlyHoursResult = convertInputToMilliseconds(hours, noInput);
+    expect(onlyHoursResult).toBe(3600000);
+    const onlyMinutesResult = convertInputToMilliseconds(noInput, minutes);
+    expect(onlyMinutesResult).toBe(600000);
+  });
+
+  test('function should throw error if both inputs are missing', () => {
+    expect(() => convertInputToMilliseconds(noInput, noInput)).toThrow();
   });
 });
