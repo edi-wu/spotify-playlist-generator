@@ -21,6 +21,7 @@ apiRouter.get(
 apiRouter.post(
   '/generatePlaylist',
   playlistController.createPlaylist,
+  playlistController.getRecommendations,
   playlistController.addTracks,
   playlistController.returnPlaylist
 );

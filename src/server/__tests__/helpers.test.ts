@@ -2,8 +2,9 @@ import {
   generateRandomString,
   getErrorDetails,
   convertInputToMilliseconds,
+  getMaxTrackDuration,
 } from '../utils/helpers';
-import { ERROR_MESSAGES } from '../constants';
+import { ERROR_MESSAGES, ONE_MIN_IN_MS } from '../constants';
 
 describe('testing random string generator', () => {
   test('function should return string of specified length', () => {
@@ -55,5 +56,22 @@ describe('testing function to convert input to milliseconds', () => {
 
   test('function should throw error if both inputs are missing', () => {
     expect(() => convertInputToMilliseconds(noInput, noInput)).toThrow();
+  });
+});
+
+describe('testing function to get max track duration', () => {
+  test('function should return time left if it is within range of 3-15 min.', () => {
+    const timeLeft = convertInputToMilliseconds('', '12');
+    expect(getMaxTrackDuration(timeLeft)).toBe(timeLeft);
+  });
+
+  test('return value should never exceed 15 min.', () => {
+    const timeLeft = convertInputToMilliseconds('', '17');
+    expect(getMaxTrackDuration(timeLeft)).toBe(15 * ONE_MIN_IN_MS);
+  });
+
+  test('return value should never be less than 3 min.', () => {
+    const timeLeft = convertInputToMilliseconds('', '2');
+    expect(getMaxTrackDuration(timeLeft)).toBe(3 * ONE_MIN_IN_MS);
   });
 });

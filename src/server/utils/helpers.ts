@@ -1,5 +1,5 @@
 import { ApiErrorResponse } from '../types';
-import { ERROR_MESSAGES } from '../constants';
+import { ERROR_MESSAGES, ONE_MIN_IN_MS, MAX_TRACK_LENGTH } from '../constants';
 
 export const generateRandomString = (length: number): string => {
   // eslint-disable-next-line operator-linebreak
@@ -55,3 +55,9 @@ export const convertInputToMilliseconds = (hours: string, minutes: string): numb
   }
   return result;
 };
+
+// function to return max track length based on time left
+// capped at 3 minutes min and 15 minutes max
+export const getMaxTrackDuration = (timeLeft: number): number =>
+  // eslint-disable-next-line implicit-arrow-linebreak
+  Math.max(Math.min(MAX_TRACK_LENGTH, timeLeft), 3 * ONE_MIN_IN_MS);

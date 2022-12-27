@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 import httpMocks from 'node-mocks-http';
 import playlistController from '../../controllers/playlistController';
 import spotifyApi from '../../utils/apiWrapper';
@@ -79,7 +80,8 @@ describe('testing middleware to get recommended tracks', () => {
     expect(spotifyApi.getRecommendations).toHaveBeenCalledWith(
       expect.objectContaining({
         limit: 1,
-        max_duration_ms: 300000,
+        min_duration_ms: ONE_MIN_IN_MS,
+        max_duration_ms: expect.any(Number),
         seed_genres: ['classical'],
       })
     );
