@@ -18,5 +18,15 @@ export type ServerError = {
   message: {
     err: string;
   };
-  errorResponse?: unknown;
+};
+
+export type ApiErrorResponse = {
+  body: {
+    error: {
+      status: number;
+      message: string;
+    };
+  };
+  statusCode: number;
+  headers: Record<string, string>;
 };

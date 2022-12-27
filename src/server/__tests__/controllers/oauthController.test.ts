@@ -1,6 +1,6 @@
 import httpMocks from 'node-mocks-http';
 import oauthController from '../../controllers/oauthController';
-import generateRandomString from '../../utils/helpers';
+import { generateRandomString } from '../../utils/helpers';
 import spotifyApi from '../../utils/apiWrapper';
 import ERROR_MESSAGES from '../../constants';
 
@@ -10,6 +10,10 @@ const next = jest.fn();
 // clear response.locals object before each test to avoid properties persisting
 beforeEach(() => {
   response.locals = {};
+});
+
+afterEach(() => {
+  jest.clearAllMocks();
 });
 
 describe('testing middleware that generates Spotify OAuth redirect URL', () => {
@@ -138,7 +142,7 @@ describe('testing middleware that obtains access token', () => {
   });
 
   test('middleware should throw error if Spotify API returns error', async () => {
-    spotifyApi.authorizationCodeGrant = jest.fn().mockReturnValueOnce(new Error('test error'));
+    spotifyApi.authorizationCodeGrant = jest.fn().mockReturnValueOnce(new Error());
     await oauthController.generateToken(request, response, next);
     expect(next).toHaveBeenCalledWith(
       expect.objectContaining({

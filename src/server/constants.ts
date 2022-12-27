@@ -1,4 +1,4 @@
-const ERROR_MESSAGES: Record<string, Record<'log' | 'response', string>> = {
+const ERROR_MESSAGES: Record<string, { log?: string; response?: string }> = {
   noEndpoint: {
     log: 'Request was made to an unavailable endpoint.',
     response: 'An error has occurred: endpoint not found.',
@@ -22,6 +22,9 @@ const ERROR_MESSAGES: Record<string, Record<'log' | 'response', string>> = {
   tokenError: {
     log: 'Token generation failed.',
     response: 'An error has occurred: unable to obtain access token from Spotify.',
+  },
+  playlistCreationFailed: {
+    response: 'Failed to create new playlist',
   },
 };
 
