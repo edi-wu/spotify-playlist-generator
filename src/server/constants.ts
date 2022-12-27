@@ -24,7 +24,13 @@ const ERROR_MESSAGES: Record<string, { log?: string; response?: string }> = {
     response: 'An error has occurred: unable to obtain access token from Spotify.',
   },
   playlistCreationFailed: {
-    response: 'Failed to create new playlist',
+    response: 'Failed to create a new playlist.',
+  },
+  trackGenerationFailed: {
+    response: 'Failed to get tracks based on user preferences.',
+  },
+  trackAdditionFailed: {
+    response: 'Failed to add tracks to the playlist.',
   },
 };
 

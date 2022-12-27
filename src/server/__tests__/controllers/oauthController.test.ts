@@ -16,7 +16,7 @@ afterEach(() => {
   jest.clearAllMocks();
 });
 
-describe('testing middleware that generates Spotify OAuth redirect URL', () => {
+describe('testing Spotify OAuth redirect URL generation middleware', () => {
   const OLD_ENV = process.env;
   const request = httpMocks.createRequest({
     method: 'GET',
@@ -63,7 +63,7 @@ describe('testing middleware that generates Spotify OAuth redirect URL', () => {
   });
 });
 
-describe('testing middleware that validates OAuth response', () => {
+describe('testing OAuth response validation middleware', () => {
   const state: string = generateRandomString(16);
   const request = httpMocks.createRequest({
     method: 'GET',
@@ -172,7 +172,7 @@ describe('testing middleware that obtains access token', () => {
   });
 });
 
-describe('testing middleware that redirects request', () => {
+describe('testing redirect middleware', () => {
   const request = httpMocks.createRequest({
     method: 'GET',
     url: '/any-route',
