@@ -142,12 +142,16 @@ describe('testing middleware that obtains access token', () => {
   });
 
   test('middleware should throw error if Spotify API returns error', async () => {
-    spotifyApi.authorizationCodeGrant = jest.fn().mockReturnValueOnce(new Error());
+    spotifyApi.authorizationCodeGrant = jest.fn().mockRejectedValueOnce({
+      statusCode: 417,
+      body: { error: { status: 417, message: 'unable to generate access token' } },
+      headers: { test: 'test' },
+    });
     await oauthController.generateToken(request, response, next);
     expect(next).toHaveBeenCalledWith(
       expect.objectContaining({
-        log: `${ERROR_MESSAGES.defaultError.log}`,
-        status: 500,
+        log: 'unable to generate access token',
+        status: 417,
         message: expect.objectContaining({ err: `${ERROR_MESSAGES.tokenError.response}` }),
       })
     );
@@ -165,7 +169,7 @@ describe('testing middleware that obtains access token', () => {
     });
     await oauthController.generateToken(request, response, next);
     expect(response.locals).toHaveProperty('cookies');
-    expect(response.locals.cookies).toEqual({ access: 'test-access', refresh: 'test-refresh' });
+    expect(response.locals.cookies).toEqual({ access: 'test-access' });
     expect(response.locals).toHaveProperty('redirectUrl');
     expect(response.locals.redirectUrl).toBe('/#/form');
     expect(next).toHaveBeenCalled();

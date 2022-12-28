@@ -71,7 +71,7 @@ oauthController.generateToken = async (req, res, next) => {
     const { access_token, refresh_token } = response.body;
     spotifyApi.setAccessToken(access_token);
     spotifyApi.setRefreshToken(refresh_token);
-    const cookiesObj: CookiesObj = { access: access_token, refresh: refresh_token };
+    const cookiesObj: CookiesObj = { access: access_token };
     res.locals.cookies = cookiesObj;
     res.locals.redirectUrl = '/#/form';
     return next();
