@@ -15,7 +15,7 @@ const LoginButton = styled(Button)`
   border-radius: 5px;
 `;
 
-const Homepage = () => {
+const Homepage = (): JSX.Element => {
   const navigate = useNavigate();
   const goToOAuth: MouseEventHandler<HTMLButtonElement> = (): void => {
     navigate('/oauth');

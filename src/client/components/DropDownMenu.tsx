@@ -9,7 +9,7 @@ const DropDownMenu = ({
   value,
   changeHandler,
   menuOptions = [],
-}: InputProps) => (
+}: InputProps): JSX.Element => (
   <label htmlFor={name}>
     {label}
     <select className={className} name={name} id={name} value={value} onChange={changeHandler}>

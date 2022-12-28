@@ -8,7 +8,7 @@ const TextInput = ({
   value,
   changeHandler,
   fieldBeforeLabel = false,
-}: InputProps) => (
+}: InputProps): JSX.Element => (
   <label htmlFor={name}>
     {fieldBeforeLabel ? null : label}
     <input
