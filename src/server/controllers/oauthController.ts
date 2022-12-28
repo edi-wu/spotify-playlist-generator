@@ -19,7 +19,7 @@ oauthController.generateRedirectUrl = (req, res, next) => {
     return next(noClientIdError);
   }
   const state: string = generateRandomString(16);
-  const scope: string = 'playlist-modify-public';
+  const scope: string = 'playlist-modify-public user-read-email user-read-private streaming';
   const redirectUri = 'http://localhost:8080/api/getToken';
   const paramsObj: OAuthQueryParams = {
     client_id: clientId,
