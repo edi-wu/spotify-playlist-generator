@@ -2,7 +2,7 @@ import querystring from 'querystring';
 import spotifyApi from '../utils/apiWrapper';
 import { generateRandomString, getErrorDetails } from '../utils/helpers';
 import { Controller, CookiesObj, OAuthQueryParams, ServerError } from '../types';
-import { ERROR_MESSAGES } from '../constants';
+import { ERROR_MESSAGES, OAUTH_REDIRECT_URI } from '../constants';
 
 const oauthController: Controller = {};
 
@@ -20,7 +20,7 @@ oauthController.generateRedirectUrl = (req, res, next) => {
   }
   const state: string = generateRandomString(16);
   const scope: string = 'playlist-modify-public user-read-email user-read-private streaming';
-  const redirectUri = 'http://localhost:8080/api/getToken';
+  const redirectUri = OAUTH_REDIRECT_URI;
   const paramsObj: OAuthQueryParams = {
     client_id: clientId,
     redirect_uri: redirectUri,

@@ -1,3 +1,5 @@
+export const OAUTH_REDIRECT_URI: string = 'http://localhost:8080/api/getToken';
+
 export const ERROR_MESSAGES: Record<string, { log?: string; response?: string }> = {
   noEndpoint: {
     log: 'Request was made to an unavailable endpoint.',
