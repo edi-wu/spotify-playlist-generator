@@ -69,6 +69,8 @@ oauthController.generateToken = async (req, res, next) => {
     const response = await spotifyApi.authorizationCodeGrant(res.locals.authCode);
     // eslint-disable-next-line @typescript-eslint/naming-convention
     const { access_token, refresh_token } = response.body;
+    spotifyApi.setAccessToken(access_token);
+    spotifyApi.setRefreshToken(refresh_token);
     const cookiesObj: CookiesObj = { access: access_token, refresh: refresh_token };
     res.locals.cookies = cookiesObj;
     res.locals.redirectUrl = '/#/form';

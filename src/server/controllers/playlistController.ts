@@ -8,9 +8,6 @@ const playlistController: Controller = {};
 
 playlistController.createPlaylist = async (req, res, next) => {
   try {
-    spotifyApi.setAccessToken(req.cookies.access);
-    // this functionality does not require refresh token; TODO: create route to refresh token
-    // spotifyApi.setRefreshToken(req.cookies.refresh);
     // TODO: look into typing req body
     // TODO: verify behavior when playlist title not provided
     const { title, description } = req.body;
