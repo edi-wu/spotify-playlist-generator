@@ -18,6 +18,41 @@ afterEach(() => {
   jest.clearAllMocks();
 });
 
+describe('testing token validation middleware', () => {
+  const request = httpMocks.createRequest({
+    method: 'POST',
+    url: '/generatePlaylist',
+    cookies: { access: mockAccessToken },
+    body: {
+      title: 'my playlist',
+      description: 'playlist description',
+      durationHours: '1',
+      durationMinutes: '30',
+      genres: 'classical',
+    },
+  });
+
+  test('middleware should throw error if invalid access token accompanies request', () => {
+    spotifyApi.getAccessToken = jest.fn().mockReturnValueOnce('a-different-token');
+    playlistController.validateToken(request, response, next);
+    expect(next).toHaveBeenCalledWith(
+      expect.objectContaining({
+        log: `${ERROR_MESSAGES.invalidAccessToken.log}`,
+        status: 400,
+        message: expect.objectContaining({
+          err: `${ERROR_MESSAGES.invalidAccessToken.response}`,
+        }),
+      })
+    );
+  });
+
+  test('middleware should call next function with no arguments if access token matches', () => {
+    spotifyApi.getAccessToken = jest.fn().mockReturnValueOnce(mockAccessToken);
+    playlistController.validateToken(request, response, next);
+    expect(next).toHaveBeenCalledWith();
+  });
+});
+
 describe('testing playlist creation middleware', () => {
   const request = httpMocks.createRequest({
     method: 'POST',
@@ -32,25 +67,8 @@ describe('testing playlist creation middleware', () => {
     },
   });
 
-  test('middleware should throw error if invalid access token accompanies request', async () => {
-    spotifyApi.getAccessToken = jest.fn().mockReturnValueOnce('a-different-token');
-    spotifyApi.createPlaylist = jest.fn();
-    await playlistController.createPlaylist(request, response, next);
-    expect(spotifyApi.createPlaylist).not.toHaveBeenCalled();
-    expect(next).toHaveBeenCalledWith(
-      expect.objectContaining({
-        log: `${ERROR_MESSAGES.invalidAccessToken.log}`,
-        status: 400,
-        message: expect.objectContaining({
-          err: `${ERROR_MESSAGES.invalidAccessToken.response}`,
-        }),
-      })
-    );
-  });
-
   test('middleware should add playlist ID onto res.locals', async () => {
     spotifyApi.createPlaylist = jest.fn().mockResolvedValueOnce({ body: { id: 'my-playlist-id' } });
-    spotifyApi.getAccessToken = jest.fn().mockReturnValueOnce(mockAccessToken);
     await playlistController.createPlaylist(request, response, next);
     expect(response.locals).toHaveProperty('playlistId');
     expect(response.locals.playlistId).toBe('my-playlist-id');
@@ -58,7 +76,6 @@ describe('testing playlist creation middleware', () => {
   });
 
   test('middleware should throw error if API responds with error', async () => {
-    spotifyApi.getAccessToken = jest.fn().mockReturnValueOnce(mockAccessToken);
     spotifyApi.createPlaylist = jest.fn().mockRejectedValueOnce({
       statusCode: 417,
       body: { error: { status: 417, message: 'unable to create playlist' } },
