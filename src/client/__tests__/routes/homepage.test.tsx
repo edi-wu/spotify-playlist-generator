@@ -1,9 +1,6 @@
 /**
  * @jest-environment jsdom
  */
-// TODO: test rendering title + button
-// TODO: test button redirects to oauth (currently placeholder)
-
 import { screen } from '@testing-library/react';
 import React from 'react';
 import '@testing-library/jest-dom';
@@ -18,7 +15,7 @@ describe('homepage rendering and navigation', () => {
     expect(screen.getByRole('button')).not.toBeDisabled();
   });
 
-  test('login button should redirect to oauth placeholder', async () => {
+  test('login button should redirect to OAuth', async () => {
     const { user } = setup(<Homepage />, { withUser: true });
     await user?.click(screen.getByText(/login with spotify/i));
     expect(window.location.pathname).toBe('/oauth');
