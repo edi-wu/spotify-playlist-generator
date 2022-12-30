@@ -6,8 +6,11 @@ const WebPlayerPage = (): JSX.Element => {
   const location = useLocation();
   return (
     <>
-      <div>This is the page for spotify web player</div>
-      <WebPlayer playlistUri={location.state.playlistId} />
+      <h1>Playlist created!</h1>
+      <WebPlayer
+        playlistUri={location.state.playlistId}
+        playlistTitle={location.state.playlistTitle}
+      />
     </>
   );
 };

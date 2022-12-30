@@ -172,7 +172,7 @@ describe('testing form validation and submission', () => {
 
   test('submission handler should not make api request if any required input is missing or invalid', async () => {
     const { user } = setup(<FormPage />, { withUser: true });
-    const generatePlaylist = jest.spyOn(playlistService, 'default');
+    const generatePlaylist = jest.spyOn(playlistService, 'generatePlaylist');
 
     await user?.click(screen.getByText(/generate my playlist/i));
     expect(generatePlaylist).not.toHaveBeenCalled();
@@ -189,7 +189,7 @@ describe('testing form validation and submission', () => {
 
   test('if input is valid, submission should make api call', async () => {
     const { user } = setup(<FormPage />, { withUser: true });
-    const generatePlaylist = jest.spyOn(playlistService, 'default');
+    const generatePlaylist = jest.spyOn(playlistService, 'generatePlaylist');
     generatePlaylist.mockResolvedValue('made api call');
 
     await user?.type(screen.getByLabelText('title'), 'my playlist');
@@ -213,7 +213,7 @@ describe('testing form validation and submission', () => {
 describe('testing form redirect after submission', () => {
   test('form should redirect to player upon request success', async () => {
     const { user } = setup(<FormPage />, { withUser: true });
-    const generatePlaylist = jest.spyOn(playlistService, 'default');
+    const generatePlaylist = jest.spyOn(playlistService, 'generatePlaylist');
     generatePlaylist.mockResolvedValue('test-playlist-id');
 
     await user?.type(screen.getByLabelText('minutes'), '10');
@@ -226,7 +226,7 @@ describe('testing form redirect after submission', () => {
 
   test('form should redirect to error page upon request failure', async () => {
     const { user } = setup(<FormPage />, { withUser: true });
-    const generatePlaylist = jest.spyOn(playlistService, 'default');
+    const generatePlaylist = jest.spyOn(playlistService, 'generatePlaylist');
     generatePlaylist.mockResolvedValue(new Error('test-server-error'));
 
     await user?.type(screen.getByLabelText('minutes'), '10');

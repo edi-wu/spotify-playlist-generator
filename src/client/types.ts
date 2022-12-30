@@ -25,6 +25,7 @@ export type AlertProps = {
 export type WebPlayerProps = {
   className?: string;
   playlistUri: string;
+  playlistTitle?: string;
 };
 
 export type FormData = {

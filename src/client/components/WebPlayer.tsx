@@ -1,23 +1,16 @@
 import React, { useState, useEffect } from 'react';
+import { playPlaylist } from '../services/playlistService';
 import getCookie from '../utils/getCookie';
 import { WebPlayerProps } from '../types';
 
-const WebPlayer = ({ playlistUri }: WebPlayerProps): JSX.Element => {
+const WebPlayer = ({ playlistUri, playlistTitle }: WebPlayerProps): JSX.Element => {
   const accessToken = getCookie('access');
   const [player, setPlayer] = useState<Spotify.Player | undefined>(undefined);
   const [deviceId, setDeviceId] = useState<string>('');
   const [playerIsReady, setPlayerIsReady] = useState<boolean>(false);
-
-  const play = (spotifyUri: string): void => {
-    fetch(`https://api.spotify.com/v1/me/player/play?device_id=${deviceId}`, {
-      method: 'PUT',
-      body: JSON.stringify({ context_uri: `spotify:playlist:${spotifyUri}` }),
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
-  };
+  const [isActive, setIsActive] = useState<boolean>(false);
+  const [isPaused, setIsPaused] = useState<boolean>(false);
+  const [currentTrack, setCurrentTrack] = useState<Spotify.Track | null>(null);
 
   useEffect(() => {
     const script = document.createElement('script');
@@ -48,17 +41,42 @@ const WebPlayer = ({ playlistUri }: WebPlayerProps): JSX.Element => {
         console.log('Device ID has gone offline', device_id);
       });
 
+      webPlayer.addListener('player_state_changed', (state) => {
+        if (!state) {
+          return;
+        }
+
+        setCurrentTrack(state.track_window.current_track);
+        setIsPaused(state.paused);
+
+        webPlayer.getCurrentState().then((playerState) => {
+          if (!playerState) {
+            setIsActive(false);
+          } else {
+            setIsActive(true);
+          }
+        });
+      });
+
       webPlayer.connect();
     };
   }, []);
 
   useEffect(() => {
     if (!playerIsReady) return;
-    console.log('this is the passed in uri', playlistUri);
-    play(playlistUri);
+    playPlaylist(deviceId, playlistUri, accessToken);
   }, [playerIsReady]);
 
-  return <div>Now Playing:</div>;
+  return (
+    <>
+      <h3>{`Now playing: ${playlistTitle}`}</h3>
+      <h4>
+        {isActive && currentTrack
+          ? `Current track: "${currentTrack.name}" - ${currentTrack.artists[0].name}`
+          : null}
+      </h4>
+    </>
+  );
 };
 
 export default WebPlayer;

@@ -6,7 +6,7 @@ import TextInput from '../components/TextInput';
 import DropDownMenu from '../components/DropDownMenu';
 import Alert from '../components/Alert';
 import isPositiveIntegerString from '../utils/inputValidation';
-import generatePlaylist from '../services/playlistService';
+import { generatePlaylist } from '../services/playlistService';
 import { FormData } from '../types';
 import { SPOTIFY_GENRE_SEEDS, ERROR_MESSAGES } from '../constants';
 
@@ -85,7 +85,7 @@ const FormPage = (): JSX.Element => {
       navigate('/error', { state: { error: serverResponse } });
       return;
     }
-    navigate('/player', { state: { playlistId: serverResponse } });
+    navigate('/player', { state: { playlistId: serverResponse, playlistTitle: formData.title } });
   };
 
   return (
