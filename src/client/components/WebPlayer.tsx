@@ -4,13 +4,14 @@ import getCookie from '../utils/getCookie';
 import { WebPlayerProps } from '../types';
 
 const WebPlayer = ({ playlistUri, playlistTitle }: WebPlayerProps): JSX.Element => {
-  const accessToken = getCookie('access');
   const [player, setPlayer] = useState<Spotify.Player | undefined>(undefined);
   const [deviceId, setDeviceId] = useState<string>('');
   const [playerIsReady, setPlayerIsReady] = useState<boolean>(false);
   const [isActive, setIsActive] = useState<boolean>(false);
   const [isPaused, setIsPaused] = useState<boolean>(false);
   const [currentTrack, setCurrentTrack] = useState<Spotify.Track | null>(null);
+
+  const accessToken = getCookie('access');
 
   useEffect(() => {
     const script = document.createElement('script');
@@ -70,11 +71,9 @@ const WebPlayer = ({ playlistUri, playlistTitle }: WebPlayerProps): JSX.Element 
   return (
     <>
       <h3>{`Now playing: ${playlistTitle}`}</h3>
-      <h4>
-        {isActive && currentTrack
-          ? `Current track: "${currentTrack.name}" - ${currentTrack.artists[0].name}`
-          : null}
-      </h4>
+      {isActive && !isPaused && currentTrack ? (
+        <h4>{`Current track: "${currentTrack.name}" - ${currentTrack.artists[0].name}`}</h4>
+      ) : null}
     </>
   );
 };
