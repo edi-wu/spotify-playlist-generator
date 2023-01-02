@@ -75,7 +75,7 @@ oauthController.generateToken = async (req, res, next) => {
     res.locals.cookies = cookiesObj;
     res.locals.redirectUrl = '/#/form';
     return next();
-  } catch (err) {
+  } catch (err: unknown) {
     const [errorLog, errorStatus] = getErrorDetails(err);
     const tokenGenerationError: ServerError = {
       log: errorLog,
@@ -88,7 +88,7 @@ oauthController.generateToken = async (req, res, next) => {
   }
 };
 
-oauthController.validateToken = async (req, res, next) => {
+oauthController.validateToken = (req, res, next) => {
   const incomingToken: string = req.cookies.access;
   const storedToken: string | undefined = spotifyApi.getAccessToken();
   if (incomingToken !== storedToken) {
@@ -100,6 +100,27 @@ oauthController.validateToken = async (req, res, next) => {
     return next(tokenValidationError);
   }
   return next();
+};
+
+oauthController.refreshToken = async (req, res, next) => {
+  try {
+    const data = await spotifyApi.refreshAccessToken();
+    const newToken = data.body.access_token;
+    spotifyApi.setAccessToken(newToken);
+    const cookiesObj: CookiesObj = { access: newToken };
+    res.locals.cookies = cookiesObj;
+    return next();
+  } catch (err: unknown) {
+    const [errorLog, errorStatus] = getErrorDetails(err);
+    const tokenRefreshError: ServerError = {
+      log: errorLog,
+      status: errorStatus,
+      message: {
+        err: `${ERROR_MESSAGES.tokenRefreshError.response}`,
+      },
+    };
+    return next(tokenRefreshError);
+  }
 };
 
 oauthController.redirect = (req, res) => {

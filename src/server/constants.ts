@@ -24,6 +24,9 @@ export const ERROR_MESSAGES: Record<string, { log?: string; response?: string }>
   tokenError: {
     response: 'An error has occurred: unable to obtain access token from Spotify.',
   },
+  tokenRefreshError: {
+    response: 'An error has occurred: unable to refresh OAuth access token.',
+  },
   invalidAccessToken: {
     log: 'Access token validation failed.',
     response: 'An error has occurred: Request is missing valid access token.',

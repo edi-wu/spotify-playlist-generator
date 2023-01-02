@@ -180,7 +180,7 @@ describe('testing token validation middleware', () => {
   const mockAccessToken = 'access-token';
   const request = httpMocks.createRequest({
     method: 'POST',
-    url: '/generatePlaylist',
+    url: '/refreshToken',
     cookies: { access: mockAccessToken },
     body: {
       title: 'my playlist',
@@ -209,6 +209,45 @@ describe('testing token validation middleware', () => {
     spotifyApi.getAccessToken = jest.fn().mockReturnValueOnce(mockAccessToken);
     oauthController.validateToken(request, response, next);
     expect(next).toHaveBeenCalledWith();
+  });
+});
+
+describe('testing middleware to refresh access token', () => {
+  const mockAccessToken = 'access-token';
+  const request = httpMocks.createRequest({
+    method: 'GET',
+    url: '/refreshToken',
+    cookies: { access: mockAccessToken },
+  });
+
+  test('middleware should update access token upon request success', async () => {
+    spotifyApi.refreshAccessToken = jest
+      .fn()
+      .mockReturnValueOnce({ body: { access_token: 'new-access-token' } });
+    spotifyApi.setAccessToken = jest.fn();
+    await oauthController.refreshToken(request, response, next);
+    expect(spotifyApi.setAccessToken).toHaveBeenCalledWith('new-access-token');
+    expect(response.locals).toHaveProperty('cookies');
+    expect(response.locals.cookies).toEqual({ access: 'new-access-token' });
+    expect(next).toHaveBeenCalled();
+  });
+
+  test('middleware should throw error if token refresh fails', async () => {
+    spotifyApi.refreshAccessToken = jest.fn().mockRejectedValueOnce({
+      statusCode: 417,
+      body: { error: { status: 417, message: 'unable to refresh access token' } },
+      headers: { test: 'test' },
+    });
+    spotifyApi.setAccessToken = jest.fn();
+    await oauthController.refreshToken(request, response, next);
+    expect(spotifyApi.setAccessToken).not.toHaveBeenCalled();
+    expect(next).toHaveBeenCalledWith(
+      expect.objectContaining({
+        log: 'unable to refresh access token',
+        status: 417,
+        message: expect.objectContaining({ err: `${ERROR_MESSAGES.tokenRefreshError.response}` }),
+      })
+    );
   });
 });
 

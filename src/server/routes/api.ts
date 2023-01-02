@@ -17,6 +17,15 @@ apiRouter.get(
   oauthController.redirect
 );
 
+// Route to refresh access token
+apiRouter.get(
+  '/refreshToken',
+  oauthController.validateToken,
+  oauthController.refreshToken,
+  setCookies,
+  (req, res) => res.status(200).json('Access token has been refreshed.')
+);
+
 // Route to generate playlist and return playlist ID
 apiRouter.post(
   '/generatePlaylist',
