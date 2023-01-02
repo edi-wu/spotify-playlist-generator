@@ -88,6 +88,20 @@ oauthController.generateToken = async (req, res, next) => {
   }
 };
 
+oauthController.validateToken = async (req, res, next) => {
+  const incomingToken: string = req.cookies.access;
+  const storedToken: string | undefined = spotifyApi.getAccessToken();
+  if (incomingToken !== storedToken) {
+    const tokenValidationError: ServerError = {
+      log: `${ERROR_MESSAGES.invalidAccessToken.log}`,
+      status: 400,
+      message: { err: `${ERROR_MESSAGES.invalidAccessToken.response}` },
+    };
+    return next(tokenValidationError);
+  }
+  return next();
+};
+
 oauthController.redirect = (req, res) => {
   res.status(302).redirect(res.locals.redirectUrl);
 };

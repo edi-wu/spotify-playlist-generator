@@ -20,6 +20,7 @@ apiRouter.get(
 // Route to generate playlist and return playlist ID
 apiRouter.post(
   '/generatePlaylist',
+  oauthController.validateToken,
   playlistController.createPlaylist,
   playlistController.getRecommendations,
   playlistController.addTracks,

@@ -6,20 +6,6 @@ import { ERROR_MESSAGES, ONE_MIN_IN_MS } from '../constants';
 
 const playlistController: Controller = {};
 
-playlistController.validateToken = async (req, res, next) => {
-  const incomingToken: string = req.cookies.access;
-  const storedToken: string | undefined = spotifyApi.getAccessToken();
-  if (incomingToken !== storedToken) {
-    const tokenValidationError: ServerError = {
-      log: `${ERROR_MESSAGES.invalidAccessToken.log}`,
-      status: 400,
-      message: { err: `${ERROR_MESSAGES.invalidAccessToken.response}` },
-    };
-    return next(tokenValidationError);
-  }
-  return next();
-};
-
 playlistController.createPlaylist = async (req, res, next) => {
   try {
     // TODO: look into typing req body

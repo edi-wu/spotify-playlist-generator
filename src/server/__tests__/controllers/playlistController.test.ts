@@ -18,41 +18,6 @@ afterEach(() => {
   jest.clearAllMocks();
 });
 
-describe('testing token validation middleware', () => {
-  const request = httpMocks.createRequest({
-    method: 'POST',
-    url: '/generatePlaylist',
-    cookies: { access: mockAccessToken },
-    body: {
-      title: 'my playlist',
-      description: 'playlist description',
-      durationHours: '1',
-      durationMinutes: '30',
-      genres: 'classical',
-    },
-  });
-
-  test('middleware should throw error if invalid access token accompanies request', () => {
-    spotifyApi.getAccessToken = jest.fn().mockReturnValueOnce('a-different-token');
-    playlistController.validateToken(request, response, next);
-    expect(next).toHaveBeenCalledWith(
-      expect.objectContaining({
-        log: `${ERROR_MESSAGES.invalidAccessToken.log}`,
-        status: 400,
-        message: expect.objectContaining({
-          err: `${ERROR_MESSAGES.invalidAccessToken.response}`,
-        }),
-      })
-    );
-  });
-
-  test('middleware should call next function with no arguments if access token matches', () => {
-    spotifyApi.getAccessToken = jest.fn().mockReturnValueOnce(mockAccessToken);
-    playlistController.validateToken(request, response, next);
-    expect(next).toHaveBeenCalledWith();
-  });
-});
-
 describe('testing playlist creation middleware', () => {
   const request = httpMocks.createRequest({
     method: 'POST',
