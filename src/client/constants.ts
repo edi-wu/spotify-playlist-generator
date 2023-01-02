@@ -130,6 +130,7 @@ export const SPOTIFY_GENRE_SEEDS: string[] = [
 export const ENDPOINTS: Record<string, string> = {
   oauth: 'http://localhost:8080/api/login',
   playlist: '/api/generatePlaylist',
+  refreshToken: '/api/refreshToken',
 };
 
 export const ERROR_MESSAGES: Record<string, string> = {
@@ -137,3 +138,5 @@ export const ERROR_MESSAGES: Record<string, string> = {
   missingDuration: 'Please specify at least one valid value for playlist length',
   missingGenre: 'Please select a genre to proceed',
 };
+
+export const ONE_MIN_IN_MS: number = 60000;

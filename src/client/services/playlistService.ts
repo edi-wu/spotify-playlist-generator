@@ -7,7 +7,7 @@ export const generatePlaylist = async (input: FormData): Promise<string | Error>
   try {
     const { data } = await axios.post<string>(url, input);
     return data;
-  } catch (err) {
+  } catch (err: unknown) {
     if (axios.isAxiosError(err) || err instanceof Error) {
       console.log('error: ', err.message);
       return new Error(`${err.message}`);
@@ -34,7 +34,7 @@ export const playPlaylist = async (
         },
       }
     );
-  } catch (err) {
+  } catch (err: unknown) {
     if (axios.isAxiosError(err) || err instanceof Error) {
       console.log('error: ', err.message);
       return;
@@ -42,5 +42,3 @@ export const playPlaylist = async (
     console.log('error:', String(err));
   }
 };
-
-export default generatePlaylist;

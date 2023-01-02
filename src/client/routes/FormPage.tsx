@@ -23,7 +23,6 @@ const SubmitButton = styled(Button)`
 `;
 
 const FormPage = (): JSX.Element => {
-  // NB will need to convert duration inputs to numbers -- do it on BE?
   const navigate = useNavigate();
   const [formData, setFormData] = useState<FormData>({
     title: '',
