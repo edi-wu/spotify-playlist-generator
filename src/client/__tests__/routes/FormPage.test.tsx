@@ -2,13 +2,14 @@
  * @jest-environment jsdom
  */
 
-import { screen } from '@testing-library/react';
+import { screen, waitFor } from '@testing-library/react';
 import React from 'react';
 import '@testing-library/jest-dom';
 import setup from '../../utils/testSetup';
 import FormPage from '../../routes/FormPage';
 import * as playlistService from '../../services/playlistService';
-import { SPOTIFY_GENRE_SEEDS, ERROR_MESSAGES } from '../../constants';
+import * as oauthService from '../../services/oauthService';
+import { SPOTIFY_GENRE_SEEDS, ERROR_MESSAGES, ONE_MIN_IN_MS } from '../../constants';
 
 afterEach(() => {
   jest.clearAllMocks();
@@ -53,6 +54,22 @@ describe('testing form rendering', () => {
     expect(
       (screen.getByText(`${SPOTIFY_GENRE_SEEDS[0]}`) as HTMLOptionElement).selected
     ).toBeTruthy();
+  });
+});
+
+describe('testing token refresh scheduling', () => {
+  test('on render, app should schedule call to refresh access token every 55 min', async () => {
+    const setIntervalSpy = jest.spyOn(global, 'setInterval');
+    const intervalPeriod = 55 * ONE_MIN_IN_MS;
+    const refreshTokenMock = jest.spyOn(oauthService, 'default');
+    // jest.useFakeTimers();
+    setup(<FormPage />);
+    await waitFor(() => {
+      expect(setIntervalSpy.mock.calls[0][0]).toEqual(expect.any(Function));
+      expect(setIntervalSpy.mock.calls[0][1]).toBe(intervalPeriod);
+    });
+    // jest.advanceTimersByTime(intervalPeriod);
+    // expect(refreshTokenMock).toHaveBeenCalled();
   });
 });
 
