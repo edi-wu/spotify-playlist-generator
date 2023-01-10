@@ -109,6 +109,7 @@ oauthController.refreshToken = async (req, res, next) => {
     spotifyApi.setAccessToken(newToken);
     const cookiesObj: CookiesObj = { access: newToken };
     res.locals.cookies = cookiesObj;
+    res.locals.responseText = 'Access token has been refreshed.';
     return next();
   } catch (err: unknown) {
     const [errorLog, errorStatus] = getErrorDetails(err);

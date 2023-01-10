@@ -9,6 +9,11 @@ export const setCookies: RequestHandler = (req, res, next) => {
   return next();
 };
 
+export const returnSuccessResponse: RequestHandler = (req, res) => {
+  const { responseText } = res.locals;
+  res.status(200).json(responseText);
+};
+
 export const unknownEndpointHandler: RequestHandler = (req, res, next) => {
   const endpointError: ServerError = {
     log: `${ERROR_MESSAGES.noEndpoint.log}`,

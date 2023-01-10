@@ -3,11 +3,15 @@ import * as middleware from '../utils/middleware';
 import { ServerError } from '../types';
 
 const request = httpMocks.createRequest();
-const response = httpMocks.createResponse();
 const next = jest.fn();
+
+afterEach(() => {
+  jest.clearAllMocks();
+});
 
 describe('testing middleware handlers', () => {
   test('cookie setter should set all provided cookies', () => {
+    const response = httpMocks.createResponse();
     response.cookie = jest.fn();
     response.locals.cookies = { cookie1: 'choco', cookie2: 'oatmeal', cookie3: 'gingerbread' };
     middleware.setCookies(request, response, next);
@@ -19,7 +23,18 @@ describe('testing middleware handlers', () => {
     expect(next).toHaveBeenCalled();
   });
 
+  test('success response handler should return status 200 and response text', () => {
+    const response = httpMocks.createResponse();
+    response.status = jest.fn(() => response);
+    response.json = jest.fn();
+    response.locals.responseText = 'test successful response';
+    middleware.returnSuccessResponse(request, response, next);
+    expect(response.status).toHaveBeenCalledWith(200);
+    expect(response.json).toHaveBeenCalledWith('test successful response');
+  });
+
   test('unknown endpoint handler should call next function with error', () => {
+    const response = httpMocks.createResponse();
     middleware.unknownEndpointHandler(request, response, next);
     expect(next).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -31,6 +46,7 @@ describe('testing middleware handlers', () => {
   });
 
   test('global error handler should return correct error status and message', () => {
+    const response = httpMocks.createResponse();
     const customError: ServerError = {
       log: 'testing error handler',
       status: 417,

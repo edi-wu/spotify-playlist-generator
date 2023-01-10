@@ -229,6 +229,8 @@ describe('testing middleware to refresh access token', () => {
     expect(spotifyApi.setAccessToken).toHaveBeenCalledWith('new-access-token');
     expect(response.locals).toHaveProperty('cookies');
     expect(response.locals.cookies).toEqual({ access: 'new-access-token' });
+    expect(response.locals).toHaveProperty('responseText');
+    expect(response.locals.responseText).toBe('Access token has been refreshed.');
     expect(next).toHaveBeenCalled();
   });
 
