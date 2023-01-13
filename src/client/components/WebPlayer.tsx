@@ -1,7 +1,26 @@
 import React, { useState, useEffect } from 'react';
+import styled from 'styled-components';
 import { playPlaylist } from '../services/playlistService';
 import getCookie from '../utils/getCookie';
 import { WebPlayerProps } from '../types';
+
+const PlayerContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+`;
+
+const PlaylistTitle = styled.h1`
+  font-weight: 300;
+  font-size: max(5vw, 36px);
+  margin-top: 25vh;
+`;
+
+const TrackName = styled.h1`
+  font-weight: 300;
+  font-size: max(3vw, 16px);
+  margin-top: 15vh;
+`;
 
 const WebPlayer = ({ playlistUri, playlistTitle }: WebPlayerProps): JSX.Element => {
   const [player, setPlayer] = useState<Spotify.Player | undefined>(undefined);
@@ -69,12 +88,12 @@ const WebPlayer = ({ playlistUri, playlistTitle }: WebPlayerProps): JSX.Element 
   }, [playerIsReady]);
 
   return (
-    <>
-      <h3>{`Now playing: ${playlistTitle}`}</h3>
+    <PlayerContainer>
+      <PlaylistTitle>{`Your playlist: ${playlistTitle}`}</PlaylistTitle>
       {isActive && !isPaused && currentTrack ? (
-        <h4>{`Current track: "${currentTrack.name}" - ${currentTrack.artists[0].name}`}</h4>
+        <TrackName>{`Now playing: "${currentTrack.name}" - ${currentTrack.artists[0].name}`}</TrackName>
       ) : null}
-    </>
+    </PlayerContainer>
   );
 };
 

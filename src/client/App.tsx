@@ -8,7 +8,6 @@ import ErrorPage from './routes/ErrorPage';
 import { RoutesConfig } from './types';
 
 const App = () => {
-  // TODO: flesh out errorElement route to handle thrown errors
   const routesConfig: RoutesConfig = [
     {
       path: '/',

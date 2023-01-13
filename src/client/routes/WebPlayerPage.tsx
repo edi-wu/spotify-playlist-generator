@@ -5,13 +5,10 @@ import WebPlayer from '../components/WebPlayer';
 const WebPlayerPage = (): JSX.Element => {
   const location = useLocation();
   return (
-    <>
-      <h1>Playlist created!</h1>
-      <WebPlayer
-        playlistUri={location.state.playlistId}
-        playlistTitle={location.state.playlistTitle}
-      />
-    </>
+    <WebPlayer
+      playlistUri={location.state.playlistId}
+      playlistTitle={location.state.playlistTitle}
+    />
   );
 };
 

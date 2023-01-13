@@ -3,16 +3,17 @@ import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import Button from '../components/Button';
 
-const LoginButton = styled(Button)`
-  background-color: goldenrod;
-  // opacity: 25%;
-  text-align: center;
-  font-size: 36px;
-  color: #0d2426;
-  &:hover {
-    opacity: 75%;
-  }
-  border-radius: 5px;
+const PageContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-contents: center;
+`;
+
+const Title = styled.h1`
+  font-weight: 300;
+  font-size: 10vw;
+  margin-top: 20vh;
 `;
 
 const Homepage = (): JSX.Element => {
@@ -21,10 +22,10 @@ const Homepage = (): JSX.Element => {
     navigate('/oauth');
   };
   return (
-    <>
-      <h1>Axolotl Beats: a Spotify playlist generator</h1>
-      <LoginButton buttonText="Login with Spotify" clickHandler={goToOAuth} />
-    </>
+    <PageContainer>
+      <Title>Axolotl Beats</Title>
+      <Button buttonText="Login with Spotify" clickHandler={goToOAuth} />
+    </PageContainer>
   );
 };
 

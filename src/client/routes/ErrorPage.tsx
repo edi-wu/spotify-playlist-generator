@@ -16,23 +16,6 @@ const ErrorText = styled.h3`
   margin-top: 30vh;
 `;
 
-const GoHomeButton = styled(Button)`
-  background-color: #1db954;
-  text-align: center;
-  font-size: max(2vw, 16px);
-  margin-top: 15vh;
-  padding-left: max(1.5rem, 1.5vw);
-  padding-right: max(1.5rem, 1.5vw);
-  padding-top: max(1rem, 1vw);
-  padding-bottom: max(1rem, 1vw);
-  color: black;
-  border: none;
-  border-radius: 30px;
-  &:hover {
-    opacity: 85%;
-  }
-`;
-
 const ErrorPage = (): JSX.Element => {
   const navigate = useNavigate();
   const goToHome: MouseEventHandler<HTMLButtonElement> = (): void => {
@@ -41,7 +24,7 @@ const ErrorPage = (): JSX.Element => {
   return (
     <Container>
       <ErrorText>Something went wrong. Please try again.</ErrorText>
-      <GoHomeButton buttonText="Return Home" clickHandler={goToHome} />
+      <Button buttonText="Return Home" clickHandler={goToHome} />
     </Container>
   );
 };
