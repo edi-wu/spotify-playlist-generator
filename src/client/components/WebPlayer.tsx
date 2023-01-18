@@ -89,7 +89,7 @@ const WebPlayer = ({ playlistUri, playlistTitle }: WebPlayerProps): JSX.Element 
 
   return (
     <PlayerContainer>
-      <PlaylistTitle>{`Your playlist: ${playlistTitle}`}</PlaylistTitle>
+      <PlaylistTitle>{`Created playlist: ${playlistTitle}`}</PlaylistTitle>
       {isActive && !isPaused && currentTrack ? (
         <TrackName>{`Now playing: "${currentTrack.name}" - ${currentTrack.artists[0].name}`}</TrackName>
       ) : null}

@@ -6,16 +6,18 @@ const Label = styled.label`
   display: flex;
 `;
 
-const InputField = styled.input`
+const ShortInputField = styled.input`
   font-size: max(16px, 2vw);
   margin-left: 10px;
-  flex: 1;
+  margin-right: 5px;
+  width: max(30px, 3vw);
   border-top-style: hidden;
   border-right-style: hidden;
   border-left-style: hidden;
   &:focus {
     outline: none;
   }
+  text-align: right;
 `;
 
 const LabelText = styled.span`
@@ -23,7 +25,7 @@ const LabelText = styled.span`
   font-size: max(16px, 2vw);
 `;
 
-const TextInput = ({
+const ShortTextInput = ({
   className,
   label,
   name,
@@ -33,7 +35,7 @@ const TextInput = ({
 }: InputProps): JSX.Element => (
   <Label htmlFor={name}>
     {fieldBeforeLabel ? null : <LabelText>{`${label}: `}</LabelText>}
-    <InputField
+    <ShortInputField
       className={className}
       type="text"
       name={name}
@@ -44,4 +46,4 @@ const TextInput = ({
     {fieldBeforeLabel ? <LabelText>{` ${label}`}</LabelText> : null}
   </Label>
 );
-export default TextInput;
+export default ShortTextInput;
