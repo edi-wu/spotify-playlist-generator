@@ -1,6 +1,7 @@
 import React, { useState, ChangeEventHandler, MouseEventHandler, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
+import NavBar from '../components/NavBar';
 import Button from '../components/Button';
 import TextInput from '../components/TextInput';
 import ShortTextInput from '../components/ShortInput';
@@ -11,6 +12,11 @@ import refreshToken from '../services/oauthService';
 import { generatePlaylist } from '../services/playlistService';
 import { FormData } from '../types';
 import { SPOTIFY_GENRE_SEEDS, ERROR_MESSAGES, ONE_MIN_IN_MS } from '../constants';
+
+const PageContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+`;
 
 const FormContainer = styled.div`
   display: flex;
@@ -24,13 +30,12 @@ const InputContainer = styled.div`
   flex-direction: column;
   align-items: left;
   width: max(50vw, 350px);
-  margin-top: 5vh;
 `;
 
 const Title = styled.h1`
   font-weight: 300;
   font-size: max(5vw, 36px);
-  margin-top: 12vh;
+  margin-top: 8vh;
 `;
 
 const LabelText = styled.div`
@@ -128,57 +133,64 @@ const FormPage = (): JSX.Element => {
   };
 
   return (
-    <FormContainer>
-      <Title>Playlist Detail</Title>
-      <InputContainer>
-        <TextInput
-          label="Title"
-          name="title"
-          value={formData.title}
-          changeHandler={handleFormInput}
-        />
-        <br />
-        <TextInput
-          label="Description"
-          name="description"
-          value={formData.description}
-          changeHandler={handleFormInput}
-        />
-        <br />
-        <PlaylistLengthContainer>
-          <LabelText>Playlist Length: </LabelText>
-          <PlaceholderContainer>
-            <ShortTextInput
-              label="hour(s)"
-              name="durationHours"
-              value={formData.durationHours}
-              changeHandler={handleFormInput}
-              fieldBeforeLabel
-            />
-            <ShortTextInput
-              label="minutes"
-              name="durationMinutes"
-              value={formData.durationMinutes}
-              changeHandler={handleFormInput}
-              fieldBeforeLabel
-            />
-          </PlaceholderContainer>
-        </PlaylistLengthContainer>
-        {invalidHours || invalidMinutes ? <Alert message={ERROR_MESSAGES.invalidDuration} /> : null}
-        {hasClicked && missingDuration ? <Alert message={ERROR_MESSAGES.missingDuration} /> : null}
-        <br />
-        <DropDownMenu
-          label="Genres"
-          defaultOptionLabel="-----SELECT-----"
-          name="genres"
-          value={formData.genres}
-          changeHandler={handleFormInput}
-          menuOptions={SPOTIFY_GENRE_SEEDS}
-        />
-        {hasClicked && missingGenre ? <Alert message={ERROR_MESSAGES.missingGenre} /> : null}
-      </InputContainer>
-      <CreatePlaylistButton buttonText="Create my playlist" clickHandler={handleSubmit} />
-    </FormContainer>
+    <PageContainer>
+      <NavBar />
+      <FormContainer>
+        <Title>Playlist Detail</Title>
+        <InputContainer>
+          <TextInput
+            label="Title"
+            name="title"
+            value={formData.title}
+            changeHandler={handleFormInput}
+          />
+          <br />
+          <TextInput
+            label="Description"
+            name="description"
+            value={formData.description}
+            changeHandler={handleFormInput}
+          />
+          <br />
+          <PlaylistLengthContainer>
+            <LabelText>Playlist Length: </LabelText>
+            <PlaceholderContainer>
+              <ShortTextInput
+                label="hour(s)"
+                name="durationHours"
+                value={formData.durationHours}
+                changeHandler={handleFormInput}
+                fieldBeforeLabel
+              />
+              <ShortTextInput
+                label="minutes"
+                name="durationMinutes"
+                value={formData.durationMinutes}
+                changeHandler={handleFormInput}
+                fieldBeforeLabel
+              />
+            </PlaceholderContainer>
+          </PlaylistLengthContainer>
+          {invalidHours || invalidMinutes ? (
+            <Alert message={ERROR_MESSAGES.invalidDuration} />
+          ) : null}
+          {hasClicked && missingDuration ? (
+            <Alert message={ERROR_MESSAGES.missingDuration} />
+          ) : null}
+          <br />
+          <DropDownMenu
+            label="Genres"
+            defaultOptionLabel="-----SELECT-----"
+            name="genres"
+            value={formData.genres}
+            changeHandler={handleFormInput}
+            menuOptions={SPOTIFY_GENRE_SEEDS}
+          />
+          {hasClicked && missingGenre ? <Alert message={ERROR_MESSAGES.missingGenre} /> : null}
+        </InputContainer>
+        <CreatePlaylistButton buttonText="Create my playlist" clickHandler={handleSubmit} />
+      </FormContainer>
+    </PageContainer>
   );
 };
 

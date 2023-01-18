@@ -6,7 +6,6 @@ const StyledButton = styled.button`
   background-color: #1db954;
   text-align: center;
   font-size: max(2vw, 16px);
-  margin-top: 15vh;
   padding-left: max(1.5rem, 1.5vw);
   padding-right: max(1.5rem, 1.5vw);
   padding-top: max(1rem, 1vw);
