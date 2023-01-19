@@ -142,12 +142,16 @@ describe('testing middleware that obtains access token', () => {
   });
 
   test('middleware should throw error if Spotify API returns error', async () => {
-    spotifyApi.authorizationCodeGrant = jest.fn().mockReturnValueOnce(new Error());
+    spotifyApi.authorizationCodeGrant = jest.fn().mockRejectedValueOnce({
+      statusCode: 417,
+      body: { error: { status: 417, message: 'unable to generate access token' } },
+      headers: { test: 'test' },
+    });
     await oauthController.generateToken(request, response, next);
     expect(next).toHaveBeenCalledWith(
       expect.objectContaining({
-        log: `${ERROR_MESSAGES.defaultError.log}`,
-        status: 500,
+        log: 'unable to generate access token',
+        status: 417,
         message: expect.objectContaining({ err: `${ERROR_MESSAGES.tokenError.response}` }),
       })
     );
@@ -165,10 +169,87 @@ describe('testing middleware that obtains access token', () => {
     });
     await oauthController.generateToken(request, response, next);
     expect(response.locals).toHaveProperty('cookies');
-    expect(response.locals.cookies).toEqual({ access: 'test-access', refresh: 'test-refresh' });
+    expect(response.locals.cookies).toEqual({ access: 'test-access' });
     expect(response.locals).toHaveProperty('redirectUrl');
     expect(response.locals.redirectUrl).toBe('/#/form');
     expect(next).toHaveBeenCalled();
+  });
+});
+
+describe('testing token validation middleware', () => {
+  const mockAccessToken = 'access-token';
+  const request = httpMocks.createRequest({
+    method: 'POST',
+    url: '/refreshToken',
+    cookies: { access: mockAccessToken },
+    body: {
+      title: 'my playlist',
+      description: 'playlist description',
+      durationHours: '1',
+      durationMinutes: '30',
+      genres: 'classical',
+    },
+  });
+
+  test('middleware should throw error if invalid access token accompanies request', () => {
+    spotifyApi.getAccessToken = jest.fn().mockReturnValueOnce('a-different-token');
+    oauthController.validateToken(request, response, next);
+    expect(next).toHaveBeenCalledWith(
+      expect.objectContaining({
+        log: `${ERROR_MESSAGES.invalidAccessToken.log}`,
+        status: 400,
+        message: expect.objectContaining({
+          err: `${ERROR_MESSAGES.invalidAccessToken.response}`,
+        }),
+      })
+    );
+  });
+
+  test('middleware should call next function with no arguments if access token matches', () => {
+    spotifyApi.getAccessToken = jest.fn().mockReturnValueOnce(mockAccessToken);
+    oauthController.validateToken(request, response, next);
+    expect(next).toHaveBeenCalledWith();
+  });
+});
+
+describe('testing middleware to refresh access token', () => {
+  const mockAccessToken = 'access-token';
+  const request = httpMocks.createRequest({
+    method: 'GET',
+    url: '/refreshToken',
+    cookies: { access: mockAccessToken },
+  });
+
+  test('middleware should update access token upon request success', async () => {
+    spotifyApi.refreshAccessToken = jest
+      .fn()
+      .mockReturnValueOnce({ body: { access_token: 'new-access-token' } });
+    spotifyApi.setAccessToken = jest.fn();
+    await oauthController.refreshToken(request, response, next);
+    expect(spotifyApi.setAccessToken).toHaveBeenCalledWith('new-access-token');
+    expect(response.locals).toHaveProperty('cookies');
+    expect(response.locals.cookies).toEqual({ access: 'new-access-token' });
+    expect(response.locals).toHaveProperty('responseText');
+    expect(response.locals.responseText).toBe('Access token has been refreshed.');
+    expect(next).toHaveBeenCalled();
+  });
+
+  test('middleware should throw error if token refresh fails', async () => {
+    spotifyApi.refreshAccessToken = jest.fn().mockRejectedValueOnce({
+      statusCode: 417,
+      body: { error: { status: 417, message: 'unable to refresh access token' } },
+      headers: { test: 'test' },
+    });
+    spotifyApi.setAccessToken = jest.fn();
+    await oauthController.refreshToken(request, response, next);
+    expect(spotifyApi.setAccessToken).not.toHaveBeenCalled();
+    expect(next).toHaveBeenCalledWith(
+      expect.objectContaining({
+        log: 'unable to refresh access token',
+        status: 417,
+        message: expect.objectContaining({ err: `${ERROR_MESSAGES.tokenRefreshError.response}` }),
+      })
+    );
   });
 });
 

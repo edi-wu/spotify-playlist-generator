@@ -2,7 +2,7 @@ import querystring from 'querystring';
 import spotifyApi from '../utils/apiWrapper';
 import { generateRandomString, getErrorDetails } from '../utils/helpers';
 import { Controller, CookiesObj, OAuthQueryParams, ServerError } from '../types';
-import { ERROR_MESSAGES } from '../constants';
+import { ERROR_MESSAGES, OAUTH_REDIRECT_URI } from '../constants';
 
 const oauthController: Controller = {};
 
@@ -19,8 +19,8 @@ oauthController.generateRedirectUrl = (req, res, next) => {
     return next(noClientIdError);
   }
   const state: string = generateRandomString(16);
-  const scope: string = 'playlist-modify-public';
-  const redirectUri = 'http://localhost:8080/api/getToken';
+  const scope: string = 'playlist-modify-public user-read-email user-read-private streaming';
+  const redirectUri = OAUTH_REDIRECT_URI;
   const paramsObj: OAuthQueryParams = {
     client_id: clientId,
     redirect_uri: redirectUri,
@@ -69,11 +69,13 @@ oauthController.generateToken = async (req, res, next) => {
     const response = await spotifyApi.authorizationCodeGrant(res.locals.authCode);
     // eslint-disable-next-line @typescript-eslint/naming-convention
     const { access_token, refresh_token } = response.body;
-    const cookiesObj: CookiesObj = { access: access_token, refresh: refresh_token };
+    spotifyApi.setAccessToken(access_token);
+    spotifyApi.setRefreshToken(refresh_token);
+    const cookiesObj: CookiesObj = { access: access_token };
     res.locals.cookies = cookiesObj;
     res.locals.redirectUrl = '/#/form';
     return next();
-  } catch (err) {
+  } catch (err: unknown) {
     const [errorLog, errorStatus] = getErrorDetails(err);
     const tokenGenerationError: ServerError = {
       log: errorLog,
@@ -83,6 +85,42 @@ oauthController.generateToken = async (req, res, next) => {
       },
     };
     return next(tokenGenerationError);
+  }
+};
+
+oauthController.validateToken = (req, res, next) => {
+  const incomingToken: string = req.cookies.access;
+  const storedToken: string | undefined = spotifyApi.getAccessToken();
+  if (incomingToken !== storedToken) {
+    const tokenValidationError: ServerError = {
+      log: `${ERROR_MESSAGES.invalidAccessToken.log}`,
+      status: 400,
+      message: { err: `${ERROR_MESSAGES.invalidAccessToken.response}` },
+    };
+    return next(tokenValidationError);
+  }
+  return next();
+};
+
+oauthController.refreshToken = async (req, res, next) => {
+  try {
+    const data = await spotifyApi.refreshAccessToken();
+    const newToken = data.body.access_token;
+    spotifyApi.setAccessToken(newToken);
+    const cookiesObj: CookiesObj = { access: newToken };
+    res.locals.cookies = cookiesObj;
+    res.locals.responseText = 'Access token has been refreshed.';
+    return next();
+  } catch (err: unknown) {
+    const [errorLog, errorStatus] = getErrorDetails(err);
+    const tokenRefreshError: ServerError = {
+      log: errorLog,
+      status: errorStatus,
+      message: {
+        err: `${ERROR_MESSAGES.tokenRefreshError.response}`,
+      },
+    };
+    return next(tokenRefreshError);
   }
 };
 

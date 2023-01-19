@@ -1,7 +1,7 @@
 import express, { Router } from 'express';
 import oauthController from '../controllers/oauthController';
 import playlistController from '../controllers/playlistController';
-import { setCookies } from '../utils/middleware';
+import { setCookies, returnSuccessResponse } from '../utils/middleware';
 
 const apiRouter: Router = express.Router();
 
@@ -17,9 +17,19 @@ apiRouter.get(
   oauthController.redirect
 );
 
+// Route to refresh access token
+apiRouter.get(
+  '/refreshToken',
+  oauthController.validateToken,
+  oauthController.refreshToken,
+  setCookies,
+  returnSuccessResponse
+);
+
 // Route to generate playlist and return playlist ID
 apiRouter.post(
   '/generatePlaylist',
+  oauthController.validateToken,
   playlistController.createPlaylist,
   playlistController.getRecommendations,
   playlistController.addTracks,

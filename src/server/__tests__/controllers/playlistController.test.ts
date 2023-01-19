@@ -8,7 +8,6 @@ import { ERROR_MESSAGES, ONE_MIN_IN_MS } from '../../constants';
 const response = httpMocks.createResponse();
 const next = jest.fn();
 const mockAccessToken = 'access-token';
-const mockRefreshToken = 'refresh-token';
 
 // clear response.locals object before each test to avoid properties persisting
 beforeEach(() => {
@@ -23,7 +22,7 @@ describe('testing playlist creation middleware', () => {
   const request = httpMocks.createRequest({
     method: 'POST',
     url: '/generatePlaylist',
-    cookies: { access: mockAccessToken, refresh: mockRefreshToken },
+    cookies: { access: mockAccessToken },
     body: {
       title: 'my playlist',
       description: 'playlist description',
@@ -64,7 +63,7 @@ describe('testing middleware to get recommended tracks', () => {
   const request = httpMocks.createRequest({
     method: 'POST',
     url: '/generatePlaylist',
-    cookies: { access: mockAccessToken, refresh: mockRefreshToken },
+    cookies: { access: mockAccessToken },
     body: {
       title: 'my playlist',
       description: 'playlist description',
@@ -173,7 +172,7 @@ describe('testing middleware to add tracks onto playlist', () => {
   const request = httpMocks.createRequest({
     method: 'POST',
     url: '/generatePlaylist',
-    cookies: { access: mockAccessToken, refresh: mockRefreshToken },
+    cookies: { access: mockAccessToken },
     body: {
       title: 'my playlist',
       description: 'playlist description',
@@ -219,7 +218,7 @@ describe('testing middleware to return playlistId as response', () => {
   const request = httpMocks.createRequest({
     method: 'POST',
     url: '/generatePlaylist',
-    cookies: { access: mockAccessToken, refresh: mockRefreshToken },
+    cookies: { access: mockAccessToken },
     body: {
       title: 'my playlist',
       description: 'playlist description',

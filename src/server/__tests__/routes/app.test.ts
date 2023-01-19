@@ -25,7 +25,7 @@ describe('testing main application routes', () => {
   });
 
   test('global error handler should catch unspecified server error', async () => {
-    oauthController.generateRedirectUrl = jest.fn().mockReturnValueOnce(new Error('error'));
+    oauthController.generateRedirectUrl = jest.fn().mockRejectedValueOnce(new Error('error'));
     const response: request.Response = await request(server).get('/api/login');
     expect(response.status).toBe(500);
     // eslint-disable-next-line no-prototype-builtins

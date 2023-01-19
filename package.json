@@ -1,6 +1,6 @@
 {
   "name": "spotify-playlist-generator",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "",
   "main": "src/server/server.ts",
   "scripts": {
@@ -58,6 +58,7 @@
     "@types/react": "^18.0.25",
     "@types/react-dom": "^18.0.9",
     "@types/react-router-dom": "^5.3.3",
+    "@types/spotify-web-playback-sdk": "^0.1.15",
     "@types/styled-components": "^5.1.26",
     "axios": "^1.2.0",
     "cookie-parser": "^1.4.6",
