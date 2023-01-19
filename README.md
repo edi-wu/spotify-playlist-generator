@@ -8,9 +8,9 @@ To run your own instance of Axolotl Beats, please follow the steps below:
 
 1. Fork and clone this repository.
 
-2. Install the npm dependencies: `npm install`
+2. Install the npm dependencies: `npm install`.
 
-3. Register your app at [Spotify Developer Dashboard](https://developer.spotify.com/dashboard/) to obtain your Client ID and Client Secret
+3. Register your app at [Spotify Developer Dashboard](https://developer.spotify.com/dashboard/) to obtain your Client ID and Client Secret.
 
 4. In the root directory of your local app instance, create a `.env` file with the following information:
 
@@ -19,7 +19,7 @@ CLIENT_ID=<your Client ID>
 CLIENT_SECRET=<your Client Secret>
 ```
 
-5. Start the app with `npm start`
+5. Start the app with `npm start`.
 
 # References
 
