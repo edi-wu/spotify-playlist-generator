@@ -6,10 +6,9 @@ import { ERROR_MESSAGES, ONE_MIN_IN_MS } from '../constants';
 
 const playlistController: Controller = {};
 
+// Function to create playlist based on user input
 playlistController.createPlaylist = async (req, res, next) => {
   try {
-    // TODO: look into typing req body
-    // TODO: verify behavior when playlist title not provided
     const { title, description } = req.body;
     const titleParam = title.length === 0 ? 'untitled playlist' : title;
     const data = await spotifyApi.createPlaylist(`${titleParam}`, {
@@ -29,16 +28,17 @@ playlistController.createPlaylist = async (req, res, next) => {
   }
 };
 
+// Function to get recommended tracks based on user duration input
 playlistController.getRecommendations = async (req, res, next) => {
   try {
     const { durationHours, durationMinutes, genres } = req.body;
     const trackList: string[] = [];
     const targetPlaylistLength: number = convertInputToMilliseconds(durationHours, durationMinutes);
-    // pad target time by 1 min. so playlist may go a little over
+    // Pad target time by 1 min. to ensure that playlist will not be shorter than requested duration
     let timeLeft: number = targetPlaylistLength + ONE_MIN_IN_MS;
     while (timeLeft > ONE_MIN_IN_MS) {
-      // max duration of track based on time left and preset max length (15 min)
-      // set minimum to 3 minutes so last song can have more variety
+      // Max track duration ranges from 3-15 min.
+      // Min. max duration set at 3 min. so that last song does not need to match timeLeft exactly
       const max_duration_ms: number = getMaxTrackDuration(timeLeft);
       const options = {
         seed_genres: [genres],
@@ -46,11 +46,12 @@ playlistController.getRecommendations = async (req, res, next) => {
         max_duration_ms,
         limit: 1,
       };
-      // cannot use promise.all since each track length is unknown until response is received
+      // Cannot use Promise.all since each track length is unknown until response is received
       // eslint-disable-next-line no-await-in-loop
       const response = await spotifyApi.getRecommendations(options);
       const track = response.body.tracks[0];
-      // throw error only if no tracks returned on the first request
+      // Throw error only if request for first track fails
+      // If subsequent request(s) fail, user will receive at least a partial playlist
       if (!track && trackList.length === 0) {
         const noTracksReturnedError: ServerError = {
           log: `${ERROR_MESSAGES.trackGenerationFailed.log}`,
@@ -76,6 +77,7 @@ playlistController.getRecommendations = async (req, res, next) => {
   }
 };
 
+// Function to add all generated tracks to the playlist
 playlistController.addTracks = async (req, res, next) => {
   try {
     await spotifyApi.addTracksToPlaylist(res.locals.playlistId, res.locals.tracks);
@@ -91,6 +93,7 @@ playlistController.addTracks = async (req, res, next) => {
   }
 };
 
+// Function to return playlistId
 playlistController.returnPlaylist = (req, res) => {
   res.status(200).json(res.locals.playlistId);
 };
